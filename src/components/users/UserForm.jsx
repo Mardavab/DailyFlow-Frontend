@@ -7,7 +7,7 @@ export const UserForm = ({ handlerCloseForm, userSelected }) => {
   const { id, username, password, email, rol } = userForm;
 
   useEffect(() => {
-    setUserForm({
+    setUserForm({ 
       ...userSelected,
     });
   }, [userSelected]);
