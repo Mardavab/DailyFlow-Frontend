@@ -11,7 +11,7 @@ export const ProductModalForm = () => {
     const { name, value } = e.target;
     setProduct({
       ...product,
-      [name]: name === 'precio' || name === 'stock' ? Number(value) : value
+      [name]: name === 'stock' ? Number(value) : value
     });
   };
 
@@ -19,7 +19,7 @@ export const ProductModalForm = () => {
     e.preventDefault();
     
     // Validaciones básicas
-    if (!product.nombre.trim() || product.precio <= 0) {
+    if (!product.name.trim() || product.price <= 0) {
       Swal.fire({
         title: "Error",
         text: "Nombre y precio válido son requeridos",
@@ -50,8 +50,8 @@ export const ProductModalForm = () => {
                 <input
                   type="text"
                   className="form-control"
-                  name="nombre"
-                  value={product.nombre}
+                  name="name"
+                  value={product.name}
                   onChange={onInputChange}
                   required
                 />
@@ -61,10 +61,10 @@ export const ProductModalForm = () => {
                 <input
                   type="number"
                   className="form-control"
-                  name="precio"
+                  name="price"
                   min="0"
                   step="0.01"
-                  value={product.precio}
+                  value={product.price}
                   onChange={onInputChange}
                   required
                 />

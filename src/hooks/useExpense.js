@@ -1,34 +1,9 @@
 import Swal from "sweetalert2";
-import { useReducer, useState } from "react";
+import { useReducer, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { expenseReducer } from "../reducers/expenseReducer";
+import api from "../api/api";
 
-const initialExpenses = [
-  {
-    id: 1,
-    amount: 500.00,
-    category: 'Oficina',
-    description: 'Materiales de papelería',
-    date: '2023-05-15',
-    time: '09:30'
-  },
-  {
-    id: 2,
-    amount: 1200.50,
-    category: 'Servicios',
-    description: 'Factura de internet',
-    date: '2023-05-16',
-    time: '11:15'
-  },
-  {
-    id: 3,
-    amount: 750.25,
-    category: 'Transporte',
-    description: 'Combustible para vehículo',
-    date: '2023-05-17',
-    time: '15:45'
-  }
-];
 
 const initialExpenseForm = {
   id: 0,
@@ -36,30 +11,47 @@ const initialExpenseForm = {
   category: '',
   description: '',
   date: new Date().toISOString().split('T')[0],
-  time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit'})
 };
 
 export const useExpense = () => {
-  const [expenses, dispatch] = useReducer(expenseReducer, initialExpenses);
+  const [expenses, dispatch] = useReducer(expenseReducer, []);
   const [expenseSelected, setExpenseSelected] = useState(initialExpenseForm);
   const [visibleForm, setVisibleForm] = useState(false);
   const navigate = useNavigate();
 
-  const handlerAddExpense = (expense) => {
-    dispatch({
-      type: expense.id === 0 ? "addExpense" : "updateExpense",
-      payload: expense,
-    });
-    Swal.fire({
-      title: expense.id === 0 ? "Gasto Registrado" : "Gasto Actualizado",
-      text:
-        expense.id === 0
-          ? "El gasto ha sido registrado con éxito!"
-          : "El gasto ha sido actualizado con éxito!",
-      icon: "success",
-    });
-    handlerCloseForm();
-    navigate('/expenses')
+  useEffect(() => {
+    api
+      .get("/expense")
+      .then(({ data }) => {
+        dispatch({ type: "loadExpenses", payload: data });
+      })
+      .catch((err) => {
+        console.error(err);
+        Swal.fire("Error", "No se pudieron cargar los gastos", "error");
+      });
+  }, []);
+
+
+  const handlerAddExpense = async (expense) => {
+    try {
+      let res;
+      if (expense.id === 0) {
+        const { id, ...payload } = expense;
+        res = await api.post("/expense", payload);
+        dispatch({ type: "addExpense", payload: res.data });
+        Swal.fire("Gasto Registrado", "El gasto ha sido registrado con éxito!", "success");
+      } else {
+        res = await api.put(`/expense/${expense.id}`, expense);
+        dispatch({ type: "updateExpense", payload: res.data });
+        Swal.fire("Gasto Actualizado", "El gasto ha sido actualizado con éxito!", "success");
+      }
+      handlerCloseForm();
+      navigate("/expenses");
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "No se pudo registrar el gasto", "error");
+    }
   };
 
   const handlerRemoveExpense = (id) => {
@@ -72,18 +64,16 @@ export const useExpense = () => {
       cancelButtonColor: "#d33",
       confirmButtonText: "Sí, ¡elimínalo!",
       cancelButtonText: "Cancelar",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        dispatch({
-          type: "removeExpense",
-          payload: id,
-        });
-        Swal.fire({
-          title: "¡Eliminado!",
-          text: "El gasto ha sido eliminado.",
-          icon: "success",
-          confirmButtonText: "Aceptar",
-        });
+        try {
+          await api.delete(`/expense/${id}`);
+          dispatch({ type: "removeExpense", payload: id });
+          Swal.fire("¡Eliminado!", "El gasto ha sido eliminado.", "success");
+        } catch (err) {
+          console.error(err);
+          Swal.fire("Error", "No se pudo eliminar el gasto", "error");
+        }
       }
     });
   };

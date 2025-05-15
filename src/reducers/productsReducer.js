@@ -1,23 +1,16 @@
 export const productsReducer = (state = [], action) => {
     switch (action.type) {
+        case "loadProducts":
+            return action.payload;
         case 'addProduct':
-            return [
-                ...state,
-                {
-                    ...action.payload,
-                    id: action.payload.id || new Date().getTime(), // Permite ID personalizado o genera uno
-                    createdAt: new Date().toISOString() // Agrega fecha de creación
-                }
-            ];
+            return [...state, action.payload,];
         
         case 'removeProduct':
             return state.filter(product => product.id !== action.payload);
         
         case 'updateProduct':
-            return state.map(product => 
-                product.id === action.payload.id 
-                    ? { ...product, ...action.payload, updatedAt: new Date().toISOString() }
-                    : product
+            return state.map((p) =>
+                p.id === action.payload.id ? action.payload : p
             );
         
         case 'clearProducts':

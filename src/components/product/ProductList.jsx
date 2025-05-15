@@ -18,8 +18,8 @@ export const ProductList = () => {
       <tbody>
         {products.map((product) => (
           <tr key={product.id}>
-            <td>{product.nombre}</td>
-            <td>${product.precio.toFixed(2)}</td>
+            <td>{product.name}</td>
+            <td>${product.price.toFixed(2)}</td>
             <td>{product.stock}</td>
             <td>{product.categoria}</td>
             <td>

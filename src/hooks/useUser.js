@@ -1,108 +1,102 @@
-import Swal from "sweetalert2";
-import { usersReducer } from "../reducers/usersReducer";
-import { useReducer, useState } from "react";
+// src/hooks/useUser.js
+import { useReducer, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
-const initialUsers = [
-  {
-    id: 1,
-    nombre: 'Juan Pérez',
-    email: 'juan.perez@example.com',
-    rol: 'Administrador',
-    fechaRegistro: '2023-01-15'
-  },
-  {
-    id: 2,
-    nombre: 'María García',
-    email: 'maria.garcia@example.com',
-    rol: 'Técnico',
-    fechaRegistro: '2023-02-20'
-  },
-  {
-    id: 3,
-    nombre: 'Carlos López',
-    email: 'carlos.lopez@example.com',
-    rol: 'Encargado',
-    fechaRegistro: '2023-03-10'
-  }
-];
+import Swal from "sweetalert2";
+import api from "../api/api";
+import { usersReducer } from "../reducers/usersReducer";
 
 const initialUserForm = {
   id: 0,
-  nombre: '',
-  password: '',
-  email: '',
-  rol: '',
-  fechaRegistro: new Date().toISOString().split('T')[0] 
+  username: "",
+  password: "",
+  email: "",
+  //rol: "",
 };
 
 export const useUser = () => {
-  const [users, dispatch] = useReducer(usersReducer, initialUsers);
+  const [users, dispatch] = useReducer(usersReducer, []);
   const [userSelected, setUserSelected] = useState(initialUserForm);
   const [visibleform, setVisibleForm] = useState(false);
   const navigate = useNavigate();
 
-  const handlerAddUser = (user) => {
-    dispatch({
-      type: user.id === 0 ? "addUser" : "updateUser",
-      payload: user,
-    });
-    Swal.fire({
-      title: user.id === 0 ? "Usuario Creado" : "Usuario Actualizado",
-      text:
-        user.id === 0
-          ? "El usuario ha sido creado con exito!"
-          : "El usuario ha sido actualizado con exito!",
-      icon: "success",
-    });
-    handlerCloseForm();
-    navigate('/security/users')
+  // 1) Carga la lista de usuarios al montar
+  useEffect(() => {
+    api
+      .get("/users")
+      .then(({ data }) => {
+        dispatch({ type: "loadUsers", payload: data });
+      })
+      .catch((err) => {
+        console.error(err);
+        Swal.fire("Error", "No se pudieron cargar los usuarios", "error");
+      });
+  }, []);
+
+  // 2) Crear o actualizar usuario
+  const handlerAddUser = async (user) => {
+    try {
+      let res;
+      if (user.id === 0) {
+        const { id, ...payload } = user;
+        res = await api.post("/users", payload);
+        dispatch({ type: "addUser", payload: res.data });
+        Swal.fire("Usuario Creado", "El usuario ha sido creado con éxito!", "success");
+      } else {
+        res = await api.put(`/users/${user.id}`, user);
+        dispatch({ type: "updateUser", payload: res.data });
+        Swal.fire("Usuario Actualizado", "El usuario ha sido actualizado con éxito!", "success");
+      }
+      handlerCloseForm();
+      navigate("/security/users");
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "No se pudo guardar el usuario", "error");
+    }
   };
 
+  // 3) Eliminar usuario
   const handlerRemoveUser = (id) => {
     Swal.fire({
       title: "¿Estás seguro?",
-      text: "¡No podrás revertir esta acción!",
+      text: "¡No podrás revertir esto!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: "Sí, ¡elimínalo!",
       cancelButtonText: "Cancelar",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        dispatch({
-          type: "removeUser",
-          payload: id,
-        });
-        Swal.fire({
-          title: "¡Eliminado!",
-          text: "El usuario ha sido eliminado.",
-          icon: "success",
-          confirmButtonText: "Aceptar",
-        });
+        try {
+          await api.delete(`/users/${id}`);
+          dispatch({ type: "removeUser", payload: id });
+          Swal.fire("¡Eliminado!", "El usuario ha sido eliminado.", "success");
+        } catch (err) {
+          console.error(err);
+          Swal.fire("Error", "No se pudo eliminar el usuario", "error");
+        }
       }
     });
   };
 
+  // 4) Abrir formulario en modo edición
   const handlerSelecterUserForm = (user) => {
     setUserSelected({ ...user });
     setVisibleForm(true);
   };
 
-  const handlerOpenForm = () => {
-    setVisibleForm(true);
-  };
+  // 5) Control de visibilidad del form
+  const handlerOpenForm = () => setVisibleForm(true);
   const handlerCloseForm = () => {
     setVisibleForm(false);
     setUserSelected(initialUserForm);
   };
+
   return {
     users,
     userSelected,
     initialUserForm,
     visibleform,
-
     handlerOpenForm,
     handlerCloseForm,
     handlerAddUser,

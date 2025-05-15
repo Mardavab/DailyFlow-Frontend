@@ -1,30 +1,21 @@
-
+// src/reducers/usersReducer.js
 export const usersReducer = (state = [], action) => {
+  switch (action.type) {
+    case "loadUsers":
+      return action.payload;
 
-    switch (action.type) {
-        case 'addUser':
+    case "addUser":
+      return [...state, action.payload];
 
-            return [
-                ...state,
-                {
-                    ...action.payload,
-                    id: new Date().getTime(),
+    case "updateUser":
+      return state.map((u) =>
+        u.id === action.payload.id ? action.payload : u
+      );
 
-                }
-            ];
-        case 'removeUser':
-            return state.filter(user => user.id !== action.payload);
-        case 'updateUser':
-            return state.map(u =>{
-                if(u.id === action.payload.id){
-                    return{
-                        ...action.payload,
-                        password: u.password
-                    };
-                }
-                return u
-            })
-        default:
-            return state;
-    }
-}
+    case "removeUser":
+      return state.filter((u) => u.id !== action.payload);
+
+    default:
+      return state;
+  }
+};

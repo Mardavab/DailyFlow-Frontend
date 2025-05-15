@@ -8,10 +8,10 @@ export const UserRow = ({ user }) => {
     <>
       <tr key={user.id}>
         <td>{user.id}</td>
-        <td>{user.nombre}</td>
+        <td>{user.username}</td>
         <td>{user.email}</td>
         <td>{user.rol}</td>
-        <td>{user.fechaRegistro}</td>
+        <td>{user.lastUpdated}</td>
         <td>
           <div style={{ display: "inline-block" }}>
             <button

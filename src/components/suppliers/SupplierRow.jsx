@@ -8,12 +8,12 @@ export const SupplierRow = ({ supplier }) => {
     <tr key={supplier.id}>
       <td>{supplier.id}</td>
       <td>
-        <div className="font-weight-bold">{supplier.nombre}</div>
+        <div className="font-weight-bold">{supplier.name}</div>
         {supplier.email && <div className="small text-muted">{supplier.email}</div>}
       </td>
       <td>
-        {supplier.contacto}
-        {supplier.telefono && <div className="small text-muted">{supplier.telefono}</div>}
+        {supplier.contactPerson}
+        {supplier.phone && <div className="small text-muted">{supplier.phone}</div>}
       </td>
       <td>
         <span className={`badge ${

@@ -6,11 +6,11 @@ export const SupplierForm = ({ handlerCloseForm, supplierSelected }) => {
   const [supplierForm, setSupplierForm] = useState(initialSupplierForm);
   const { 
     id, 
-    nombre, 
-    contacto, 
-    telefono, 
+    name, 
+    contactPerson, 
+    phone, 
     email, 
-    direccion, 
+    address, 
     tipoProveedor 
   } = supplierForm;
 
@@ -30,7 +30,9 @@ export const SupplierForm = ({ handlerCloseForm, supplierSelected }) => {
 
   const onSubmit = (event) => {
     event.preventDefault();
-    if (!nombre || !contacto || !telefono || !tipoProveedor) {
+
+    console.log(supplierForm)
+    if (!name || !contactPerson || !phone /**|| !tipoProveedor**/) {
       alert("Debe completar todos los campos obligatorios");
       return;
     }
@@ -54,8 +56,8 @@ export const SupplierForm = ({ handlerCloseForm, supplierSelected }) => {
               type="text"
               className="form-control"
               placeholder="Nombre completo"
-              name="nombre"
-              value={nombre || ''}
+              name="name"
+              value={name || ''}
               onChange={onInputChange}
               required
             />
@@ -67,8 +69,8 @@ export const SupplierForm = ({ handlerCloseForm, supplierSelected }) => {
               type="text"
               className="form-control"
               placeholder="Nombre del contacto"
-              name="contacto"
-              value={contacto || ''}
+              name="contactPerson"
+              value={contactPerson || ''}
               onChange={onInputChange}
               required
             />
@@ -80,8 +82,8 @@ export const SupplierForm = ({ handlerCloseForm, supplierSelected }) => {
               type="tel"
               className="form-control"
               placeholder="Número de teléfono"
-              name="telefono"
-              value={telefono || ''}
+              name="phone"
+              value={phone || ''}
               onChange={onInputChange}
               required
             />
@@ -107,8 +109,8 @@ export const SupplierForm = ({ handlerCloseForm, supplierSelected }) => {
               type="text"
               className="form-control"
               placeholder="Dirección completa"
-              name="direccion"
-              value={direccion || ''}
+              name="address"
+              value={address || ''}
               onChange={onInputChange}
             />
           </div>
@@ -119,8 +121,8 @@ export const SupplierForm = ({ handlerCloseForm, supplierSelected }) => {
               className="form-control"
               name="tipoProveedor"
               value={tipoProveedor || ''}
-              onChange={onInputChange}
-              required
+              //onChange={onInputChange}
+              //required
             >
               <option value="">Seleccione un tipo</option>
               <option value="Materiales">Materiales</option>

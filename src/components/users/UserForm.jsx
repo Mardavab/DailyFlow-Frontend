@@ -4,7 +4,7 @@ import { UserContext } from "../../context/User/UserContext";
 export const UserForm = ({ handlerCloseForm, userSelected }) => {
   const { handlerAddUser, initialUserForm } = useContext(UserContext);
   const [userForm, setUserForm] = useState(initialUserForm);
-  const { id, nombre, password, email, rol } = userForm;
+  const { id, username, password, email, rol } = userForm;
 
   useEffect(() => {
     setUserForm({
@@ -22,7 +22,7 @@ export const UserForm = ({ handlerCloseForm, userSelected }) => {
 
   const onSubmit = (event) => {
     event.preventDefault();
-    if (!nombre || !email || !rol) {
+    if (!username || !email /**|| !rol**/) {
       alert("Debe completar todos los campos obligatorios");
       return;
     }
@@ -42,8 +42,8 @@ export const UserForm = ({ handlerCloseForm, userSelected }) => {
         type="text"
         className="form-control my-3 w-75"
         placeholder="Nombre completo"
-        name="nombre"
-        value={nombre || ''}
+        name="username"
+        value={username || ''}
         onChange={onInputChange}
         required
       />
@@ -72,9 +72,10 @@ export const UserForm = ({ handlerCloseForm, userSelected }) => {
         className="form-control my-3 w-75"
         name="rol"
         value={rol || ''}
-        onChange={onInputChange}
-        required
+        //onChange={onInputChange}
+        //required
       >
+        {/* Hcer que aparesan los roles que vienen del back */}
         <option value="">Seleccione un rol</option>
         <option value="Administrador">Administrador</option>
         <option value="Técnico">Técnico</option>
