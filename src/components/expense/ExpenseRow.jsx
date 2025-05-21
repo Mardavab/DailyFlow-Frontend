@@ -9,7 +9,6 @@ export const ExpenseRow = ({ expense }) => {
     <tr key={expense.id}>
       <td>{expense.id}</td>
       <td>${expense.amount}</td>
-      <td>{expense.category}</td>
       <td>{expense.description}</td>
       <td>{expense.date}</td>
       <td>{expense.time}</td>

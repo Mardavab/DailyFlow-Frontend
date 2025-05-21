@@ -1,22 +1,43 @@
 import { ResumeCard } from "./ResumeCard";
+import { useDashboard } from "../hooks/useDashboard";
+import { Spinner } from "../components/Spinner"; // Opcional, usa tu propio spinner
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend,
+} from 'recharts';
+
+const COLORS = ["#007bff", "#28a745", "#17a2b8", "#ffc107", "#dc3545"];
 
 export const DashboardContent = () => {
+  const { summary, loading, error } = useDashboard();
+
+  if (loading) {
+    return <Spinner message="Cargando el panel..." />;
+  }
+  if (error) return <div className="alert alert-danger">Error cargando dashboard</div>;
+  if (!summary) return null;
+
+  // Prepara los datos para los gráficos
+  const areaData = (summary.incomeSummary || []).map((amount, i) => ({
+    mes: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"][i],
+    ingresos: amount,
+  }));
+
+  const pieData = Object.entries(summary.incomeSources || {}).map(([source, value]) => ({
+    name: "Ventas", value
+  }));
+
   return (
     <div className="container-fluid">
       {/* Encabezado */}
       <div className="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 className="h3 mb-0 text-gray-800">Panel Principal</h1>
-        <button className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-          <i className="fas fa-download fa-sm text-white-50 mr-2"></i>
-          Generar Reporte
-        </button>
       </div>
 
       {/* Tarjetas de Resumen */}
       <div className="row">
         <ResumeCard
           titulo="Ingresos (Mensuales)"
-          valor="$40,000"
+          valor={summary.monthlyIncome?.toLocaleString("es-CO", { style: "currency", currency: "COP" })}
           icono="fa-calendar"
           colorBorde="primary"
           colorTexto="primary"
@@ -24,7 +45,7 @@ export const DashboardContent = () => {
 
         <ResumeCard
           titulo="Ingresos (Anuales)"
-          valor="$215,000"
+          valor={summary.annualIncome?.toLocaleString("es-CO", { style: "currency", currency: "COP" })}
           icono="fa-dollar-sign"
           colorBorde="success"
           colorTexto="success"
@@ -32,17 +53,17 @@ export const DashboardContent = () => {
 
         <ResumeCard
           titulo="Tareas"
-          valor="50%"
+          valor={Math.round(summary.tasksProgress * 100) + "%"}
           icono="fa-clipboard-list"
           colorBorde="info"
           colorTexto="info"
           mostrarProgreso={true}
-          porcentajeProgreso={50}
+          porcentajeProgreso={Math.round(summary.tasksProgress * 100)}
         />
 
         <ResumeCard
           titulo="Solicitudes Pendientes"
-          valor="18"
+          valor={summary.pendingRequests}
           icono="fa-comments"
           colorBorde="warning"
           colorTexto="warning"
@@ -60,9 +81,21 @@ export const DashboardContent = () => {
               </h6>
             </div>
             <div className="card-body">
-              <div className="chart-area">
-                <canvas id="myAreaChart"></canvas>
-              </div>
+              <ResponsiveContainer width="100%" height={200}>
+                <AreaChart data={areaData}>
+                  <defs>
+                    <linearGradient id="colorIng" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#007bff" stopOpacity={0.8} />
+                      <stop offset="95%" stopColor="#007bff" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="mes" />
+                  <YAxis />
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <Tooltip />
+                  <Area type="monotone" dataKey="ingresos" stroke="#007bff" fillOpacity={1} fill="url(#colorIng)" />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </div>
@@ -76,20 +109,25 @@ export const DashboardContent = () => {
               </h6>
             </div>
             <div className="card-body">
-              <div className="chart-pie pt-4 pb-2">
-                <canvas id="myPieChart"></canvas>
-              </div>
-              <div className="mt-4 text-center small">
-                <span className="mr-2">
-                  <i className="fas fa-circle text-primary"></i> Directos
-                </span>
-                <span className="mr-2">
-                  <i className="fas fa-circle text-success"></i> Sociales
-                </span>
-                <span className="mr-2">
-                  <i className="fas fa-circle text-info"></i> Referidos
-                </span>
-              </div>
+              <ResponsiveContainer width="100%" height={200}>
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={60}
+                    label
+                  >
+                    {pieData.map((entry, idx) => (
+                      <Cell key={`cell-${idx}`} fill={COLORS[idx % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </div>

@@ -1,19 +1,14 @@
 import Swal from "sweetalert2";
 import { productsReducer } from "../reducers/productsReducer";
 import { useReducer, useState, useEffect } from "react";
-import api from "../api/api";
 import { useNavigate } from "react-router-dom";
-
-
+import api from "../api/api";
 
 const initialProductForm = {
   id: 0,
   name: '',
-  price: 0,
-  stock: 0,
-  categoria: '',
-  size: ''
-  
+  price: '',
+  stock: '',
 };
 
 export const useProducts = () => {
@@ -22,6 +17,7 @@ export const useProducts = () => {
   const [visibleForm, setVisibleForm] = useState(false);
   const navigate = useNavigate();
 
+  // 1) Cargar la lista de productos desde el backend
   useEffect(() => {
     api
       .get("/product")
@@ -30,40 +26,46 @@ export const useProducts = () => {
       })
       .catch((err) => {
         console.error(err);
-        Swal.fire("Error", "No se pudieron cargar los Productos", "error");
+        Swal.fire("Error", "No se pudieron cargar los productos", "error");
       });
   }, []);
 
+  // 2) Crear o actualizar producto
   const handlerAddProduct = async (product) => {
     try {
       let res;
-      if (product.id === 0) {
+      if (!product.id || product.id === 0) {
+        // POST (crear): quitar id antes de enviar
         const { id, ...payload } = product;
         res = await api.post("/product", payload);
         dispatch({ type: "addProduct", payload: res.data });
-        Swal.fire("Producto Creado", "El Producto ha sido creado con éxito!", "success");
+        Swal.fire("Producto creado", "El producto ha sido creado con éxito.", "success");
       } else {
+        // PUT (actualizar)
         res = await api.put(`/product/${product.id}`, product);
         dispatch({ type: "updateProduct", payload: res.data });
-        Swal.fire("Producto Actualizado", "El Producto ha sido actualizado con éxito!", "success");
+        Swal.fire("Producto actualizado", "El producto ha sido actualizado con éxito.", "success");
       }
       handlerCloseForm();
       navigate("/inventory");
     } catch (err) {
       console.error(err);
-      Swal.fire("Error", "No se pudo guardar el Producto", "error");
+      let msg = "No se pudo guardar el producto";
+      if (err.response?.status === 409) msg = "El producto ya existe";
+      Swal.fire("Error", msg, "error");
     }
   };
 
+  // 3) Eliminar producto
   const handlerRemoveProduct = (id) => {
     Swal.fire({
       title: "¿Estás seguro?",
-      text: "Esta acción eliminará el producto permanentemente",
+      text: "¡No podrás revertir esto!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Sí, eliminar",
+      confirmButtonText: "Sí, ¡elimínalo!",
       cancelButtonText: "Cancelar",
     }).then(async (result) => {
       if (result.isConfirmed) {
@@ -73,21 +75,20 @@ export const useProducts = () => {
           Swal.fire("¡Eliminado!", "El producto ha sido eliminado.", "success");
         } catch (err) {
           console.error(err);
-          Swal.fire("Error", "No se pudo eliminar el Producto", "error");
+          Swal.fire("Error", "No se pudo eliminar el producto", "error");
         }
       }
     });
   };
 
+  // 4) Abrir formulario en modo edición
   const handlerSelectProduct = (product) => {
     setProductSelected({ ...product });
     setVisibleForm(true);
   };
 
-  const handlerOpenForm = () => {
-    setVisibleForm(true);
-  };
-
+  // 5) Control de visibilidad del form
+  const handlerOpenForm = () => setVisibleForm(true);
   const handlerCloseForm = () => {
     setVisibleForm(false);
     setProductSelected(initialProductForm);

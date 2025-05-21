@@ -22,7 +22,7 @@ export const ExpenseForm = ({ handlerCloseForm, expenseSelected }) => {
 
   const onSubmit = (event) => {
     event.preventDefault();
-    if (!amount || !category || !date || !time) { // Updated property names
+    if (!amount || !date || !time) { // Updated property names
       alert("Debe completar todos los campos obligatorios");
       return;
     }
@@ -50,20 +50,6 @@ export const ExpenseForm = ({ handlerCloseForm, expenseSelected }) => {
         required
       />
 
-      <select
-        className="form-control my-3 w-75"
-        name="category"
-        value={category || ""}
-        onChange={onInputChange}
-        required
-      >
-        <option value="">Seleccione categoría</option>
-        <option value="Alimentos">Alimentos</option>
-        <option value="Transporte">Transporte</option>
-        <option value="Servicios">Servicios</option>
-        <option value="Oficina">Oficina</option>
-        <option value="Otros">Otros</option>
-      </select>
 
       <textarea
         className="form-control my-3 w-75"

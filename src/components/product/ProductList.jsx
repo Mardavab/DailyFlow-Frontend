@@ -11,7 +11,6 @@ export const ProductList = () => {
           <th>Nombre</th>
           <th>Precio</th>
           <th>Stock</th>
-          <th>Categoría</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -21,7 +20,6 @@ export const ProductList = () => {
             <td>{product.name}</td>
             <td>${product.price.toFixed(2)}</td>
             <td>{product.stock}</td>
-            <td>{product.categoria}</td>
             <td>
               <button 
                 onClick={() => handlerSelectProduct(product)} 

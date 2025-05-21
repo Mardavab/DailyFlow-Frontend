@@ -11,7 +11,6 @@ export const SupplierForm = ({ handlerCloseForm, supplierSelected }) => {
     phone, 
     email, 
     address, 
-    tipoProveedor 
   } = supplierForm;
 
   useEffect(() => {
@@ -32,7 +31,7 @@ export const SupplierForm = ({ handlerCloseForm, supplierSelected }) => {
     event.preventDefault();
 
     console.log(supplierForm)
-    if (!name || !contactPerson || !phone /**|| !tipoProveedor**/) {
+    if (!name || !contactPerson || !phone ) {
       alert("Debe completar todos los campos obligatorios");
       return;
     }
@@ -113,23 +112,6 @@ export const SupplierForm = ({ handlerCloseForm, supplierSelected }) => {
               value={address || ''}
               onChange={onInputChange}
             />
-          </div>
-
-          <div className="form-group">
-            <label>Tipo de Proveedor*</label>
-            <select
-              className="form-control"
-              name="tipoProveedor"
-              value={tipoProveedor || ''}
-              //onChange={onInputChange}
-              //required
-            >
-              <option value="">Seleccione un tipo</option>
-              <option value="Materiales">Materiales</option>
-              <option value="Servicios">Servicios</option>
-              <option value="Equipos">Equipos</option>
-              <option value="Logística">Logística</option>
-            </select>
           </div>
         </div>
       </div>

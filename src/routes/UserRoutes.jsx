@@ -7,12 +7,12 @@ import { TopNavbar } from "../components/sidebar/TopNavbar";
 import { UserProvider } from "../context/User/UserProvider";
 import { SalesProvider } from "../context/sales/SalesProvider";
 import { ExpenseProvider } from "../context/expense/ExpenseProvider";
-import { RoleProvider } from "../context/role/RoleProvider";
+
 import { ExpenseContent } from "../components/expense/ExpenseContent";
-import { RolesContent } from "../components/role/RolesContent";
+
 import { SupplierProvider } from "../context/Supplier/SupplierProvider ";
 import { SuppliersContent } from "../components/suppliers/SuppliersContent";
-import { InvoiceProvider } from "../context/Invoice/InvoiceProvider";
+import { InvoiceProvider } from "../context/Invoice/InvoiceContext";
 import { InvoicesContent } from "../components/inovices/InvoicesContent";
 import { ProductProvider } from "../context/product/ProductProvider";
 import { ProductsContent } from "../components/product/ProductsContent";
@@ -28,7 +28,7 @@ export const UserRoutes = () => {
               <UserProvider>
                 <SalesProvider>
                   <ExpenseProvider>
-                    <RoleProvider>
+                    
                       <SupplierProvider>
                         <InvoiceProvider>
                           <ProductProvider>
@@ -46,10 +46,7 @@ export const UserRoutes = () => {
                                 path="/security/users"
                                 element={<UsersContent />}
                               />
-                              <Route
-                                path="/security/roles"
-                                element={<RolesContent />}
-                              />
+                              
                               <Route
                                 path="/purchases/invoices"
                                 element={<InvoicesContent />}
@@ -71,7 +68,7 @@ export const UserRoutes = () => {
                           </ProductProvider>
                         </InvoiceProvider>
                       </SupplierProvider>
-                    </RoleProvider>
+                    
                   </ExpenseProvider>
                 </SalesProvider>
               </UserProvider>

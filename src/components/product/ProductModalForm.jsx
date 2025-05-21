@@ -1,24 +1,27 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { ProductContext } from "../../context/Product/ProductContext";
 import Swal from "sweetalert2";
 
 export const ProductModalForm = () => {
   const { productSelected, initialProductForm, handlerAddProduct, handlerCloseForm } = useContext(ProductContext);
-  
-  const [product, setProduct] = useState(productSelected || initialProductForm);
+
+  const [product, setProduct] = useState(initialProductForm);
+
+  // Sincroniza el formulario al editar
+  useEffect(() => {
+    setProduct(productSelected || initialProductForm);
+  }, [productSelected, initialProductForm]);
 
   const onInputChange = (e) => {
     const { name, value } = e.target;
     setProduct({
       ...product,
-      [name]: name === 'stock' ? Number(value) : value
+      [name]: name === 'stock' || name === 'price' ? Number(value) : value
     });
   };
 
   const onSubmit = (e) => {
     e.preventDefault();
-    
-    // Validaciones básicas
     if (!product.name.trim() || product.price <= 0) {
       Swal.fire({
         title: "Error",
@@ -27,12 +30,11 @@ export const ProductModalForm = () => {
       });
       return;
     }
-
     handlerAddProduct(product);
   };
 
   return (
-    <div className=" abrir-modal animacion fadeIn" style={{ display: 'block' }} tabIndex="-1" role="dialog">
+    <div className="abrir-modal animacion fadeIn" style={{ display: 'block' }} tabIndex="-1" role="dialog">
       <div className="modal-dialog " role="document">
         <div className="modal-content">
           <div className="modal-header">
@@ -51,7 +53,7 @@ export const ProductModalForm = () => {
                   type="text"
                   className="form-control"
                   name="name"
-                  value={product.name}
+                  value={product.name || ''}
                   onChange={onInputChange}
                   required
                 />
@@ -64,7 +66,7 @@ export const ProductModalForm = () => {
                   name="price"
                   min="0"
                   step="0.01"
-                  value={product.price}
+                  value={product.price || ''}
                   onChange={onInputChange}
                   required
                 />
@@ -76,18 +78,7 @@ export const ProductModalForm = () => {
                   className="form-control"
                   name="stock"
                   min="0"
-                  value={product.stock}
-                  onChange={onInputChange}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Categoría</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  name="categoria"
-                  value={product.categoria}
+                  value={product.stock || ''}
                   onChange={onInputChange}
                   required
                 />

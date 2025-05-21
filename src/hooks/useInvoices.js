@@ -1,254 +1,134 @@
+import { useReducer, useState, useEffect } from "react";
 import Swal from "sweetalert2";
+import api from "../api/api";
 import { invoicesReducer } from "../reducers/invoicesReducer";
-import { useReducer, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSuppliers } from "./useSuppliers";
-
-const initialInvoices = [
-  {
-    id: 1,
-    numeroFactura: "FAC-001",
-    proveedorId: 1,
-    fechaEmision: "2023-01-15",
-    fechaVencimiento: "2023-02-15",
-    total: 1500.0,
-    estado: "pendiente",
-    pagos: [],
-    saldoPendiente: 1500.0,
-    items: [
-      {
-        id: 1,
-        descripcion: "Materiales de oficina",
-        cantidad: 5,
-        precioUnitario: 100.0,
-      },
-      {
-        id: 2,
-        descripcion: "Servicios técnicos",
-        cantidad: 10,
-        precioUnitario: 100.0,
-      },
-    ],
-  },
-  {
-    id: 2,
-    numeroFactura: "FAC-002",
-    proveedorId: 2,
-    fechaEmision: "2023-02-20",
-    fechaVencimiento: "2023-03-20",
-    total: 2500.5,
-    estado: "pagado",
-    pagos: [
-      {
-        id: "p1",
-        fecha: "2023-02-25",
-        monto: 2500.5,
-        metodo: "transferencia",
-        Referencia: "No23123",
-      },
-    ],
-    saldoPendiente: 0,
-    items: [
-      {
-        id: 1,
-        descripcion: "Equipos electrónicos",
-        cantidad: 2,
-        precioUnitario: 1000.0,
-      },
-    ],
-  },
-];
 
 const initialInvoiceForm = {
   id: 0,
-  numeroFactura: "",
-  proveedorId: "",
-  fechaEmision: new Date().toISOString().split("T")[0],
-  fechaVencimiento: "",
-  estado: "pendiente",
-  total: 0,
+  invoiceNumber: "",
+  issueDate: "",
+  dueDate: "",
+  supplierId: "",
   items: [],
+  status: "PENDIENTE",
+  total: 0,
+  pendingBalance: 0,
+  payments: [],
 };
 
 export const useInvoices = () => {
-  const [invoices, dispatch] = useReducer(invoicesReducer, initialInvoices);
+  const [invoices, dispatch] = useReducer(invoicesReducer, []);
   const [invoiceSelected, setInvoiceSelected] = useState(initialInvoiceForm);
   const [visibleForm, setVisibleForm] = useState(false);
   const navigate = useNavigate();
-  const { suppliers } = useSuppliers();
-  
 
-  const calculateTotal = (items) => {
-    return items.reduce((total, item) => {
-      return total + item.cantidad * item.precioUnitario;
-    }, 0);
+  // Cargar facturas al montar
+  useEffect(() => {
+    fetchInvoices();
+  }, []);
+
+  const fetchInvoices = async () => {
+    try {
+      const { data } = await api.get("/invoices");
+      dispatch({ type: "loadInvoices", payload: data });
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "No se pudieron cargar las facturas", "error");
+    }
   };
 
-  const handlerAddInvoice = (invoice) => {
-    const invoiceWithTotal = {
-      ...invoice,
-      total: calculateTotal(invoice.items),
-      saldoPendiente: calculateTotal(invoice.items),
-      pagos: [],
-    };
+  // Crear o actualizar factura
+  const handlerAddInvoice = async (invoice) => {
+    try {
+      const payload = {
+        invoiceNumber: invoice.invoiceNumber,
+        issueDate: invoice.issueDate,
+        dueDate: invoice.dueDate,
+        supplierId: invoice.supplierId,
+        items: invoice.items.map(item => ({
+          description: item.description,
+          quantity: Number(item.quantity),
+          price: Number(item.price),
+        })),
+      };
 
-    dispatch({
-      type: invoice.id === 0 ? "addInvoice" : "updateInvoice",
-      payload: invoiceWithTotal,
-    });
-
-    Swal.fire({
-      title: invoice.id === 0 ? "Factura Creada" : "Factura Actualizada",
-      text:
-        invoice.id === 0
-          ? "La factura ha sido creada con éxito!"
-          : "La factura ha sido actualizada con éxito!",
-      icon: "success",
-    });
-    handlerCloseForm();
-    navigate("/purchases/invoices");
+      let res;
+      if (!invoice.id || invoice.id === 0) {
+        res = await api.post("/invoices", payload);
+        // Alternativa 1: Agregar al estado local
+        dispatch({ type: "addInvoice", payload: res.data });
+        // Alternativa 2: Refrescar desde backend (recomendado si hay lógica de backend sobre totales)
+        await fetchInvoices();
+        Swal.fire("Factura creada", "La factura ha sido registrada.", "success");
+      } else {
+        res = await api.put(`/invoices/${invoice.id}`, payload);
+        dispatch({ type: "updateInvoice", payload: res.data });
+        await fetchInvoices();
+        Swal.fire("Factura actualizada", "La factura ha sido actualizada.", "success");
+      }
+      handlerCloseForm(); // <-- Cierra el modal después de actualizar
+      navigate("/purchases/invoices");
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "No se pudo guardar la factura", "error");
+    }
   };
 
+  // Eliminar factura
   const handlerRemoveInvoice = (id) => {
     Swal.fire({
-      title: "¿Estás seguro?",
-      text: "¡No podrás revertir esta acción!",
+      title: "¿Eliminar factura?",
+      text: "¡No podrás revertir esto!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Sí, ¡elimínala!",
+      confirmButtonText: "Sí, eliminar",
       cancelButtonText: "Cancelar",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        dispatch({
-          type: "removeInvoice",
-          payload: id,
-        });
-        Swal.fire({
-          title: "¡Eliminada!",
-          text: "La factura ha sido eliminada.",
-          icon: "success",
-        });
+        try {
+          await api.delete(`/invoices/${id}`);
+          // Alternativa: refresca desde backend
+          await fetchInvoices();
+          // dispatch({ type: "removeInvoice", payload: id });
+          Swal.fire("Eliminada", "La factura ha sido eliminada.", "success");
+        } catch (err) {
+          console.error(err);
+          Swal.fire("Error", "No se pudo eliminar la factura", "error");
+        }
       }
     });
   };
 
-  const handlerSelectInvoiceForm = (invoice) => {
-    setInvoiceSelected({
-      ...invoice,
-      items: invoice.items.map((item) => ({
-        id: item.id || Math.random().toString(36).substr(2, 9),
-        ...item,
-      })),
-    });
-    setVisibleForm(true);
+  // Agregar un pago a una factura
+  const handlerAddPayment = async (invoiceId, payment) => {
+    try {
+      const payload = {
+        date: payment.date,
+        amount: Number(payment.amount),
+        method: payment.method,
+      };
+      await api.post(`/invoices/${invoiceId}/payments`, payload);
+      await fetchInvoices();
+      Swal.fire("Pago registrado", "El pago ha sido registrado.", "success");
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "No se pudo registrar el pago", "error");
+    }
   };
 
-  const handlerOpenForm = () => {
-    setInvoiceSelected(initialInvoiceForm);
-    setVisibleForm(true);
-  };
-
+  // Abrir y cerrar form
+  const handlerOpenForm = () => setVisibleForm(true);
   const handlerCloseForm = () => {
     setVisibleForm(false);
     setInvoiceSelected(initialInvoiceForm);
   };
 
-  const handlerAddItem = (item) => {
-    setInvoiceSelected((prev) => ({
-      ...prev,
-      items: [
-        ...prev.items,
-        {
-          ...item,
-          id: Math.random().toString(36).substr(2, 9),
-        },
-      ],
-    }));
-  };
-
-  const handlerRemoveItem = (itemId) => {
-    setInvoiceSelected((prev) => ({
-      ...prev,
-      items: prev.items.filter((item) => item.id !== itemId),
-    }));
-  };
-
-  const getInvoicePayments = (invoiceId) => {
-    const invoice = invoices.find((inv) => inv.id === invoiceId);
-    return invoice ? invoice.pagos : [];
-  };
-
-  const validatePayment = (invoiceId, pago) => {
-    const invoice = invoices.find((inv) => inv.id === invoiceId);
-
-    if (!invoice) {
-      return { valid: false, message: "Factura no encontrada" };
-    }
-
-    if (pago.monto <= 0) {
-      return { valid: false, message: "El monto debe ser mayor a cero" };
-    }
-
-    if (invoice.estado === "pagado") {
-      return {
-        valid: false,
-        message: "La factura ya está completamente pagada",
-      };
-    }
-
-    if (pago.monto > invoice.saldoPendiente) {
-      return { valid: false, message: "El monto excede el saldo pendiente" };
-    }
-
-    if (!pago.metodo || pago.metodo.trim() === "") {
-      return { valid: false, message: "Debe especificar un método de pago" };
-    }
-
-    return { valid: true };
-  };
-
-  const handlerAddPayment = (invoiceId, pago) => {
-    const validation = validatePayment(invoiceId, pago);
-    if (!validation.valid) {
-      Swal.fire("Error", validation.message, "error");
-      return;
-    }
-
-    const invoice = invoices.find((inv) => inv.id === invoiceId);
-    const newPayment = {
-      id: Math.random().toString(36).substr(2, 9),
-      fecha: new Date().toISOString().split("T")[0],
-      monto: pago.monto,
-      metodo: pago.metodo,
-      referencia: pago.referencia || "",
-    };
-
-    const nuevoSaldo = invoice.saldoPendiente - pago.monto;
-    let nuevoEstado = invoice.estado;
-
-    if (nuevoSaldo === 0) {
-      nuevoEstado = "pagado";
-    } else if (nuevoSaldo < invoice.saldoPendiente) {
-      nuevoEstado = "parcial";
-    }
-
-    dispatch({
-      type: "addPayment",
-      payload: {
-        invoiceId,
-        pago: newPayment,
-        nuevoSaldo,
-        nuevoEstado,
-      },
-    });
-
-    Swal.fire(
-      "Pago Registrado",
-      "El pago se ha registrado correctamente",
-      "success"
-    );
+  const handlerSelectInvoiceForm = (invoice) => {
+    setInvoiceSelected({ ...invoice });
+    setVisibleForm(true);
   };
 
   return {
@@ -256,16 +136,11 @@ export const useInvoices = () => {
     invoiceSelected,
     initialInvoiceForm,
     visibleForm,
-    suppliers,
-
-    getInvoicePayments,
     handlerOpenForm,
     handlerCloseForm,
     handlerAddInvoice,
     handlerRemoveInvoice,
     handlerSelectInvoiceForm,
-    handlerAddItem,
-    handlerRemoveItem,
     handlerAddPayment,
   };
 };

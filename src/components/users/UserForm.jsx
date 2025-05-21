@@ -1,14 +1,18 @@
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../context/User/UserContext";
+import { useRoles } from "../../hooks/useRoles"; // <--- Importa el hook de roles
 
 export const UserForm = ({ handlerCloseForm, userSelected }) => {
   const { handlerAddUser, initialUserForm } = useContext(UserContext);
+  const roles = useRoles(); // <--- Aquí traes los roles del backend
+
   const [userForm, setUserForm] = useState(initialUserForm);
-  const { id, username, password, email, rol } = userForm;
+  const { id, username, password, email, roleId } = userForm; // roleId será el campo para enviar
 
   useEffect(() => {
-    setUserForm({ 
+    setUserForm({
       ...userSelected,
+      roleId: userSelected.roleId || "", // por defecto vacío si no está
     });
   }, [userSelected]);
 
@@ -22,12 +26,19 @@ export const UserForm = ({ handlerCloseForm, userSelected }) => {
 
   const onSubmit = (event) => {
     event.preventDefault();
-    if (!username || !email /**|| !rol**/) {
+    if (!username || !email || !userForm.roleId) {
       alert("Debe completar todos los campos obligatorios");
       return;
     }
 
-    handlerAddUser(userForm);
+    // El backend espera roles como una lista de objetos con id
+    // OJO: ajusta esto si tu backend espera un campo diferente
+    const userToSend = {
+      ...userForm,
+      roles: [{ id: Number(userForm.roleId) }]
+    };
+
+    handlerAddUser(userToSend);
     setUserForm(initialUserForm);
   };
 
@@ -70,16 +81,17 @@ export const UserForm = ({ handlerCloseForm, userSelected }) => {
       />
       <select
         className="form-control my-3 w-75"
-        name="rol"
-        value={rol || ''}
-        //onChange={onInputChange}
-        //required
+        name="roleId"
+        value={userForm.roleId || ''}
+        onChange={onInputChange}
+        required
       >
-        {/* Hcer que aparesan los roles que vienen del back */}
         <option value="">Seleccione un rol</option>
-        <option value="Administrador">Administrador</option>
-        <option value="Técnico">Técnico</option>
-        <option value="Encargado">Encargado</option>
+        {roles.map(role => (
+          <option key={role.id} value={role.id}>
+            {role.name}
+          </option>
+        ))}
       </select>
       <input type="hidden" name="id" value={id} />
       <button className="btn btn-primary" type="submit">

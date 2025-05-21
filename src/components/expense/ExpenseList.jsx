@@ -18,7 +18,6 @@ export const ExpenseList = () => {
           <tr>
             <th>ID</th>
             <th>Monto</th>
-            <th>Categoría</th>
             <th>Descripción</th>
             <th>Fecha</th>
             <th>Hora</th>
@@ -30,7 +29,6 @@ export const ExpenseList = () => {
           <tr>
             <th>ID</th>
             <th>Monto</th>
-            <th>Categoría</th>
             <th>Descripción</th>
             <th>Fecha</th>
             <th>Hora</th>

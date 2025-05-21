@@ -74,8 +74,6 @@ export const SideBar = () => {
         isCollapsible={true}
         items={[
           { title: 'Usuarios', to: '/security/users' },
-          { title: 'Roles', to: '/security/roles' },
-          {/** title: 'Negocios', to: '/security/businesses'  */}
         ]}
       />
 

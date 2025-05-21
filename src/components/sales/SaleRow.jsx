@@ -9,23 +9,29 @@ export const SaleRow = ({ sale }) => {
       <td>{sale.id}</td>
       <td>
         $
-        {sale.monto.toLocaleString("es-CO", {
+        {Number(sale.amount).toLocaleString("es-CO", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         })}
       </td>
-      <td>{sale.metodoPago}</td>
-      <td>{sale.fecha}</td>
-      <td>{sale.hora}</td>
+      <td>{sale.paymentMethod}</td>
+      <td>{sale.date}</td>
+      <td>{sale.time}</td>
+      <td>
+        <ul className="mb-0">
+          {sale.details?.map((det) => (
+            <li key={det.id}>
+              {det.product.name} x{det.quantity}
+            </li>
+          ))}
+        </ul>
+      </td>
       <td>
         <div style={{ display: "inline-block" }}>
           <button
             type="button"
             className="btn btn-info btn-circle"
-            onClick={() => {handlerSelectSaleForm(sale)
-                console.log(sale);
-                
-            }}
+            onClick={() => handlerSelectSaleForm(sale)}
           >
             <i className="fas fa-edit"></i>
           </button>

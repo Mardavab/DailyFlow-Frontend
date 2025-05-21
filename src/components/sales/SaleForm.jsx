@@ -7,24 +7,33 @@ export const SaleForm = ({ handlerCloseForm, saleSelected }) => {
   const { products } = useContext(ProductContext);
   const [saleForm, setSaleForm] = useState({
     ...initialSaleForm,
-    productos: []
+    items: []
   });
-  
-  // Estado para manejar la selección temporal de productos
+
+  // Para selección temporal de producto
   const [selectedProduct, setSelectedProduct] = useState({
-    productoId: '',
-    cantidad: 1,
-    precioUnitario: 0
+    productId: '',
+    quantity: 1
   });
 
   useEffect(() => {
-    if (saleSelected) {
+    if (saleSelected && saleSelected.id) {
       setSaleForm({
         ...saleSelected,
-        productos: saleSelected.productos || []
+        items: saleSelected.details
+          ? saleSelected.details.map(det => ({
+              productId: det.product.id,
+              quantity: det.quantity,
+              name: det.product.name,
+              price: det.product.price,
+              subtotal: det.product.price * det.quantity
+            }))
+          : []
       });
+    } else {
+      setSaleForm({ ...initialSaleForm, items: [] });
     }
-  }, [saleSelected]);
+  }, [saleSelected, initialSaleForm]);
 
   const onInputChange = ({ target }) => {
     const { name, value } = target;
@@ -37,85 +46,72 @@ export const SaleForm = ({ handlerCloseForm, saleSelected }) => {
   // Maneja cambios en la selección temporal de productos
   const onProductSelectChange = ({ target }) => {
     const { name, value } = target;
-    const productId = name === 'productoId' ? value : selectedProduct.productoId;
-    const product = products.find(p => p.id === Number(productId));
-    
     setSelectedProduct({
       ...selectedProduct,
-      [name]: value,
-      precioUnitario: name === 'productoId' ? (product ? product.precio : 0) : selectedProduct.precioUnitario
+      [name]: value
     });
   };
 
-  // Agrega un producto a la lista de productos de la venta
+  // Agrega un producto a la lista de items
   const addProductToSale = () => {
-    if (!selectedProduct.productoId || selectedProduct.cantidad <= 0) {
+    if (!selectedProduct.productId || selectedProduct.quantity <= 0) {
       alert("Seleccione un producto y una cantidad válida");
       return;
     }
 
-    const product = products.find(p => p.id === Number(selectedProduct.productoId));
+    const product = products.find(p => p.id === Number(selectedProduct.productId));
     if (!product) return;
 
-    const newProductItem = {
-      productoId: product.id,
-      nombre: product.nombre,
-      cantidad: Number(selectedProduct.cantidad),
-      precioUnitario: product.precio,
-      subtotal: product.precio * Number(selectedProduct.cantidad)
+    const newItem = {
+      productId: product.id,
+      name: product.name,
+      quantity: Number(selectedProduct.quantity),
+      price: product.price,
+      subtotal: product.price * Number(selectedProduct.quantity)
     };
 
     setSaleForm({
       ...saleForm,
-      productos: [...saleForm.productos, newProductItem],
-      monto: (saleForm.monto || 0) + newProductItem.subtotal
+      items: [...saleForm.items, newItem]
     });
 
-    // Resetear selección temporal
-    setSelectedProduct({
-      productoId: '',
-      cantidad: 1,
-      precioUnitario: 0
-    });
+    // Reset temporal
+    setSelectedProduct({ productId: '', quantity: 1 });
   };
 
   // Elimina un producto de la lista
   const removeProductFromSale = (index) => {
-    const updatedProducts = [...saleForm.productos];
-    const removedProduct = updatedProducts.splice(index, 1)[0];
-    
+    const updatedItems = [...saleForm.items];
+    updatedItems.splice(index, 1);
     setSaleForm({
       ...saleForm,
-      productos: updatedProducts,
-      monto: (saleForm.monto || 0) - removedProduct.subtotal
+      items: updatedItems
     });
   };
 
+  const total = saleForm.items.reduce((acc, item) => acc + (item.subtotal || (item.price * item.quantity)), 0);
+
   const onSubmit = (event) => {
     event.preventDefault();
-    if (!saleForm.monto || !saleForm.metodoPago || !saleForm.fecha || !saleForm.hora) {
-      alert("Debe completar todos los campos obligatorios");
+    if (!saleForm.paymentMethod || saleForm.items.length === 0) {
+      alert("Debe completar todos los campos obligatorios y agregar productos");
       return;
     }
-
-    if (saleForm.productos.length === 0) {
-      alert("Debe agregar al menos un producto a la venta");
-      return;
-    }
-
-    handlerAddSale(saleForm);
-    setSaleForm({
-      ...initialSaleForm,
-      productos: []
+    // Solo mandamos los campos que el backend espera
+    handlerAddSale({
+      id: saleForm.id,
+      paymentMethod: saleForm.paymentMethod,
+      items: saleForm.items.map(item => ({
+        productId: item.productId,
+        quantity: item.quantity
+      }))
     });
+    setSaleForm({ ...initialSaleForm, items: [] });
   };
 
   const onCloseForm = () => {
     handlerCloseForm();
-    setSaleForm({
-      ...initialSaleForm,
-      productos: []
-    });
+    setSaleForm({ ...initialSaleForm, items: [] });
   };
 
   return (
@@ -126,14 +122,14 @@ export const SaleForm = ({ handlerCloseForm, saleSelected }) => {
           <div className="col-md-5">
             <select
               className="form-control"
-              name="productoId"
-              value={selectedProduct.productoId}
+              name="productId"
+              value={selectedProduct.productId}
               onChange={onProductSelectChange}
             >
               <option value="">Seleccione un producto</option>
               {products.map(product => (
                 <option key={product.id} value={product.id}>
-                  {product.nombre} - ${product.precio.toFixed(2)}
+                  {product.name} - ${product.price.toLocaleString()}
                 </option>
               ))}
             </select>
@@ -143,14 +139,11 @@ export const SaleForm = ({ handlerCloseForm, saleSelected }) => {
               type="number"
               className="form-control"
               placeholder="Cantidad"
-              name="cantidad"
+              name="quantity"
               min="1"
-              value={selectedProduct.cantidad}
+              value={selectedProduct.quantity}
               onChange={onProductSelectChange}
             />
-          </div>
-          <div className="col-md-2">
-            <span>${selectedProduct.precioUnitario * selectedProduct.cantidad}</span>
           </div>
           <div className="col-md-2">
             <button 
@@ -175,12 +168,12 @@ export const SaleForm = ({ handlerCloseForm, saleSelected }) => {
               </tr>
             </thead>
             <tbody>
-              {saleForm.productos.map((item, index) => (
+              {saleForm.items.map((item, index) => (
                 <tr key={index}>
-                  <td>{item.nombre}</td>
-                  <td>{item.cantidad}</td>
-                  <td>${item.precioUnitario.toFixed(2)}</td>
-                  <td>${item.subtotal.toFixed(2)}</td>
+                  <td>{item.name}</td>
+                  <td>{item.quantity}</td>
+                  <td>${Number(item.price).toLocaleString()}</td>
+                  <td>${Number(item.subtotal || (item.price * item.quantity)).toLocaleString()}</td>
                   <td>
                     <button 
                       type="button"
@@ -198,14 +191,14 @@ export const SaleForm = ({ handlerCloseForm, saleSelected }) => {
       </div>
 
       <div className="mb-3">
-        <h5>Total: ${saleForm.monto?.toFixed(2) || '0.00'}</h5>
+        <h5>Total: ${total.toLocaleString()}</h5>
       </div>
 
       <div className="mb-3">
         <select
           className="form-control"
-          name="metodoPago"
-          value={saleForm.metodoPago || ''}
+          name="paymentMethod"
+          value={saleForm.paymentMethod || ''}
           onChange={onInputChange}
           required
         >
@@ -217,36 +210,12 @@ export const SaleForm = ({ handlerCloseForm, saleSelected }) => {
         </select>
       </div>
 
-      <div className="row mb-3">
-        <div className="col-md-6">
-          <input
-            type="date"
-            className="form-control"
-            name="fecha"
-            value={saleForm.fecha || ''}
-            onChange={onInputChange}
-            required
-          />
-        </div>
-        <div className="col-md-6">
-          <input
-            type="time"
-            className="form-control"
-            name="hora"
-            value={saleForm.hora || ''}
-            onChange={onInputChange}
-            required
-          />
-        </div>
-      </div>
-
       <input type="hidden" name="id" value={saleForm.id} />
 
       <div className="d-flex justify-content-end">
         <button className="btn btn-primary me-2" type="submit">
           {saleForm.id > 0 ? "Actualizar" : "Registrar"}
         </button>
-
         {handlerCloseForm && (
           <button
             onClick={onCloseForm}

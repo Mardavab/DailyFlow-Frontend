@@ -1,4 +1,3 @@
-// src/hooks/useUser.js
 import { useReducer, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -10,7 +9,7 @@ const initialUserForm = {
   username: "",
   password: "",
   email: "",
-  //rol: "",
+  role: "",
 };
 
 export const useUser = () => {
@@ -19,7 +18,7 @@ export const useUser = () => {
   const [visibleform, setVisibleForm] = useState(false);
   const navigate = useNavigate();
 
-  // 1) Carga la lista de usuarios al montar
+  // 1) Carga la lista de usuarios al montar el componente
   useEffect(() => {
     api
       .get("/users")
@@ -34,25 +33,28 @@ export const useUser = () => {
 
   // 2) Crear o actualizar usuario
   const handlerAddUser = async (user) => {
-    try {
-      let res;
-      if (user.id === 0) {
-        const { id, ...payload } = user;
-        res = await api.post("/users", payload);
-        dispatch({ type: "addUser", payload: res.data });
-        Swal.fire("Usuario Creado", "El usuario ha sido creado con éxito!", "success");
-      } else {
-        res = await api.put(`/users/${user.id}`, user);
-        dispatch({ type: "updateUser", payload: res.data });
-        Swal.fire("Usuario Actualizado", "El usuario ha sido actualizado con éxito!", "success");
-      }
-      handlerCloseForm();
-      navigate("/security/users");
-    } catch (err) {
-      console.error(err);
-      Swal.fire("Error", "No se pudo guardar el usuario", "error");
+  try {
+    let res;
+    if (!user.id || user.id === 0) {
+      const { id, ...payload } = user;
+      // Si tu backend espera roles como [{id:...}], aquí va directo
+      res = await api.post("/users", payload);
+      dispatch({ type: "addUser", payload: res.data });
+      Swal.fire("Usuario creado", "El usuario ha sido creado con éxito.", "success");
+    } else {
+      res = await api.put(`/users/${user.id}`, user);
+      dispatch({ type: "updateUser", payload: res.data });
+      Swal.fire("Usuario actualizado", "El usuario ha sido actualizado con éxito.", "success");
     }
-  };
+    handlerCloseForm();
+    navigate("/security/users");
+  } catch (err) {
+    console.error(err);
+    let msg = "No se pudo guardar el usuario";
+    if (err.response?.status === 409) msg = "El usuario o email ya existe";
+    Swal.fire("Error", msg, "error");
+  }
+};
 
   // 3) Eliminar usuario
   const handlerRemoveUser = (id) => {

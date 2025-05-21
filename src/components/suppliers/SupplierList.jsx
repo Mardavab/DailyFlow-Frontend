@@ -18,7 +18,6 @@ export const SupplierList = () => {
             <th>ID</th>
             <th>Proveedor</th>
             <th>Contacto</th>
-            <th>Tipo</th>
             <th>Acciones</th>
           </tr>
         </thead>

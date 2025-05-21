@@ -1,39 +1,33 @@
 import { useContext } from "react";
 import { InvoiceContext } from "../../context/Invoice/InvoiceContext";
 
-export const InvoiceRow = ({ 
+export const InvoiceRow = ({
   invoice,
   onShowPaymentForm,
   onShowHistoryModal,
-  onClosePaymentForm,
-  onCloseHistoryModal
 }) => {
-  const {
-    handlerRemoveInvoice,
-    suppliers
-  } = useContext(InvoiceContext);
+  const { handlerRemoveInvoice, suppliers = [] } = useContext(InvoiceContext);
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("es-CO", {
+  const formatCurrency = (amount) =>
+    new Intl.NumberFormat("es-CO", {
       style: "currency",
       currency: "COP",
     }).format(amount);
-  };
 
-  const getSupplierName = (proveedorId) => {
-    const supplier = suppliers.find((s) => s.id == proveedorId);
-    return supplier ? supplier.nombre : "N/A";
+  const getSupplierName = (supplierId) => {
+    const supplier = (suppliers || []).find((s) => s.id === Number(supplierId));
+    return supplier ? (supplier.nombre || supplier.name) : "N/A";
   };
 
   const getStatusBadgeClass = (status) => {
-    switch (status.toLowerCase()) {
-      case "pagada":
+    switch (status?.toUpperCase()) {
+      case "PAGADO":
         return "badge-success";
-      case "parcial":
+      case "PARCIAL":
         return "badge-info";
-      case "pendiente":
+      case "PENDIENTE":
         return "badge-warning";
-      case "vencida":
+      case "VENCIDA":
         return "badge-danger";
       default:
         return "badge-secondary";
@@ -41,22 +35,26 @@ export const InvoiceRow = ({
   };
 
   return (
-    <tr key={invoice.id}>
+    <tr>
       <td>{invoice.id}</td>
-      <td className="font-weight-bold">{invoice.numeroFactura}</td>
-      <td>{getSupplierName(invoice.proveedorId)}</td>
-      <td>{new Date(invoice.fechaEmision).toLocaleDateString("es-CO")}</td>
+      <td>{invoice.invoiceNumber}</td>
+      <td>{getSupplierName(invoice.supplier?.id || invoice.supplierId)}</td>
+      <td>
+        {invoice.issueDate
+          ? new Date(invoice.issueDate).toLocaleDateString("es-CO")
+          : ""}
+      </td>
       <td className="text-right">{formatCurrency(invoice.total)}</td>
       <td
         className={`text-right font-weight-bold ${
-          invoice.saldoPendiente > 0 ? "text-danger" : "text-success"
+          invoice.pendingBalance > 0 ? "text-danger" : "text-success"
         }`}
       >
-        {formatCurrency(invoice.saldoPendiente)}
+        {formatCurrency(invoice.pendingBalance)}
       </td>
       <td>
-        <span className={`badge ${getStatusBadgeClass(invoice.estado)}`}>
-          {invoice.estado.toUpperCase()}
+        <span className={`badge ${getStatusBadgeClass(invoice.status)}`}>
+          {invoice.status?.toUpperCase()}
         </span>
       </td>
       <td>
@@ -64,23 +62,21 @@ export const InvoiceRow = ({
           <button
             type="button"
             className="btn btn-secondary btn-circle mr-2"
-            onClick={() => onShowHistoryModal(invoice)} // Cambiado a objeto completo
+            onClick={() => onShowHistoryModal(invoice)}
             title="Ver historial de pagos"
-            disabled={!invoice.pagos || invoice.pagos.length === 0}
+            disabled={!invoice.payments || invoice.payments.length === 0}
           >
             <i className="fas fa-history"></i>
           </button>
-
           <button
             type="button"
             className="btn btn-success btn-circle mr-2"
             onClick={() => onShowPaymentForm(invoice)}
             title="Registrar pago"
-            disabled={invoice.saldoPendiente <= 0}
+            disabled={invoice.pendingBalance <= 0}
           >
             <i className="fas fa-money-bill-wave"></i>
           </button>
-
           <button
             type="button"
             className="btn btn-danger btn-circle"

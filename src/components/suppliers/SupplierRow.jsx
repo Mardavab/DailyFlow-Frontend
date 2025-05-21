@@ -16,16 +16,6 @@ export const SupplierRow = ({ supplier }) => {
         {supplier.phone && <div className="small text-muted">{supplier.phone}</div>}
       </td>
       <td>
-        <span className={`badge ${
-          supplier.tipoProveedor === 'Materiales' ? 'badge-primary' :
-          supplier.tipoProveedor === 'Servicios' ? 'badge-success' :
-          supplier.tipoProveedor === 'Equipos' ? 'badge-warning' :
-          'badge-secondary'
-        }`}>
-          {supplier.tipoProveedor}
-        </span>
-      </td>
-      <td>
         <div className="d-flex">
           <button
             type="button"

@@ -1,115 +1,124 @@
-import { useContext } from "react";
-import { InvoiceList } from "./InvoiceList";
+import { useState, useContext } from "react";
 import { InvoiceContext } from "../../context/Invoice/InvoiceContext";
 import { InvoiceModalForm } from "./InvoiceModalForm";
-import {StatCard} from "./InvoiceStatCard";
+import { InvoiceList } from "./InvoiceList";
 import { PaymentModalForm } from "./PaymentModalForm";
+import { PaymentHistoryModal } from "./PaymentHistoryModal";
+import { InvoiceStatCard } from "./InvoiceStatCard";
 
 export const InvoicesContent = () => {
   const {
     invoices,
+    invoiceSelected,
+    initialInvoiceForm,
     visibleForm,
     handlerOpenForm,
-    handlerRemoveInvoice,
+    handlerCloseForm,
     handlerSelectInvoiceForm,
-    suppliers,
-    getInvoicePayments,
-    invoiceSelected
   } = useContext(InvoiceContext);
 
-  const stats ={
-    total: invoices.length,
-    paid: invoices.filter(i => i.estado === 'pagado').length,
-    pending: invoices.filter(i => i.estado === 'pendiente').length,
-    partial: invoices.filter(i => i.estado === 'parcial').length,
-    totalAmount: invoices.reduce((sum, inv) => sum + inv.total, 0),
-    pendingAmount: invoices.reduce((sum, inv) => sum + inv.saldoPendiente, 0)
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [activeInvoice, setActiveInvoice] = useState(null);
+
+  const handleShowPaymentForm = (invoice) => {
+    setActiveInvoice(invoice);
+    setShowPaymentModal(true);
   };
-  
+
+  const handleShowHistoryModal = (invoice) => {
+    setActiveInvoice(invoice);
+    setShowHistoryModal(true);
+  };
+
+  const handleClosePaymentModal = () => {
+    setShowPaymentModal(false);
+    setActiveInvoice(null);
+  };
+
+  const handleCloseHistoryModal = () => {
+    setShowHistoryModal(false);
+    setActiveInvoice(null);
+  };
+
+  // Estadísticas
+  const stats = {
+    total: invoices.length,
+    paid: invoices.filter((i) => i.status === "PAGADO").length,
+    pending: invoices.filter((i) => i.status === "PENDIENTE").length,
+    partial: invoices.filter((i) => i.status === "PARCIAL").length,
+    totalAmount: invoices.reduce((sum, inv) => sum + (inv.total || 0), 0),
+    pendingAmount: invoices.reduce(
+      (sum, inv) => sum + (inv.pendingBalance || 0),
+      0
+    ),
+  };
+
   return (
-    <>
-      <PaymentModalForm/>
-
-      {visibleForm && <InvoiceModalForm />}
-      
-      <div className="container-fluid">
-        {/* Header */}
-        <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
-          <div className="d-flex flex-wrap gap-3">
-            <StatCard 
-              icon="file-invoice" 
-              value={stats.total}
-              label="Total Facturas"
-              color="primary"
-            />
-            
-            <StatCard 
-              icon="check-circle" 
-              value={stats.paid }
-              label="Pagadas"
-              color="success"
-            />
-            
-            <StatCard 
-              icon="clock" 
-              value={stats.pending} 
-              label="Pendientes"
-              color="warning"
-            />
-
-            <StatCard 
-              icon="money-bill-wave" 
-              value={stats.partial}
-              label="Parciales"
-              color="info"
-            />
-          </div>
-          {/** 
-          <div className="d-flex gap-2">
-            <button 
-              onClick={() => {
-                // agregar  reporte aquí
-              }}
-              className="btn btn-secondary"
-              disabled={invoices.length === 0}
-            >
-              <i className="fas fa-file-export mr-2"></i>
-              Exportar
-            </button>
-          </div>*/}
-        </div>
-
-        {/* Invoices Table */}
-        <div className="card shadow mb-4">
-          <div className="card-header py-3 d-sm-flex align-items-center justify-content-between">
-            <h1 className="h3 m-0 font-weight-bold text-primary">
-              Gestión de Facturas
-            </h1>
-            <button 
-              onClick={handlerOpenForm} 
-              className="btn btn-success btn-circle"
-              title="Nueva factura"
-              disabled={suppliers.length === 0}
-            >
-               <i className="fas fa-file-invoice-dollar"></i>
-            </button>
-          </div>
-
-          <div className="card-body">
-            <div className="table-responsive">
-              {invoices.length === 0 ? (
-                <div className={`alert ${suppliers.length === 0 ? 'alert-danger' : 'alert-warning'}`}>
-                  {suppliers.length === 0 
-                    ? "No hay proveedores registrados. Debe registrar al menos un proveedor antes de crear facturas." 
-                    : "No hay facturas registradas en el sistema"}
-                </div>
-              ) : (
-                <InvoiceList />
-              )}
-            </div>
-          </div>
-        </div>
+    <div className="container mt-4">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2>Facturación</h2>
+        <button className="btn btn-primary" onClick={handlerOpenForm}>
+          <i className="fas fa-plus"></i> Nueva Factura
+        </button>
       </div>
-    </>
+      <div className="row mb-4">
+        <InvoiceStatCard
+          label="Facturas"
+          value={stats.total}
+          color="primary"
+          icon="fas fa-file-invoice"
+        />
+        <InvoiceStatCard
+          label="Pagadas"
+          value={stats.paid}
+          color="success"
+          icon="fas fa-check-circle"
+        />
+        <InvoiceStatCard
+          label="Pendientes"
+          value={stats.pending}
+          color="warning"
+          icon="fas fa-clock"
+        />
+        <InvoiceStatCard
+          label="Parciales"
+          value={stats.partial}
+          color="info"
+          icon="fas fa-exclamation"
+        />
+        <InvoiceStatCard
+          label="Monto Total"
+          value={stats.totalAmount.toLocaleString("es-CO")}
+          color="dark"
+          icon="fas fa-dollar-sign"
+        />
+        <InvoiceStatCard
+          label="Pendiente"
+          value={stats.pendingAmount.toLocaleString("es-CO")}
+          color="danger"
+          icon="fas fa-exclamation-circle"
+        />
+      </div>
+      <InvoiceList
+        onShowPaymentForm={handleShowPaymentForm}
+        onShowHistoryModal={handleShowHistoryModal}
+      />
+      <InvoiceModalForm
+        show={visibleForm}
+        handlerCloseForm={handlerCloseForm}
+        invoiceSelected={invoiceSelected}
+      />
+      <PaymentModalForm
+        show={showPaymentModal}
+        handlerCloseModal={handleClosePaymentModal}
+        invoice={activeInvoice}
+      />
+      <PaymentHistoryModal
+        show={showHistoryModal}
+        handlerCloseModal={handleCloseHistoryModal}
+        invoice={activeInvoice}
+      />
+    </div>
   );
 };

@@ -42,16 +42,7 @@ export const TopNavbar = () => {
             <div
               className="dropdown-menu dropdown-menu-right shadow animated--grow-in show"
               aria-labelledby="userDropdown"
-            >
-              <button className="dropdown-item">
-                <i className="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                Perfil
-              </button>
-              <button className="dropdown-item">
-                <i className="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                Configuración
-              </button>
-              <div className="dropdown-divider"></div>
+            >          
               <button className="dropdown-item" onClick={handlerLogout}>
                 <i className="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                 Cerrar sesión

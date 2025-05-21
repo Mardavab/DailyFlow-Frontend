@@ -4,7 +4,7 @@ import { SalesContext } from "../../context/sales/SalesContext";
 
 export const SaleList = () => {
   const { sales = [] } = useContext(SalesContext);
-  
+
   return (
     <>
       <table
@@ -20,10 +20,10 @@ export const SaleList = () => {
             <th>Método de Pago</th>
             <th>Fecha</th>
             <th>Hora</th>
+            <th>Productos</th>
             <th>Acciones</th>
           </tr>
         </thead>
-
         <tfoot>
           <tr>
             <th>ID</th>
@@ -31,13 +31,13 @@ export const SaleList = () => {
             <th>Método de Pago</th>
             <th>Fecha</th>
             <th>Hora</th>
+            <th>Productos</th>
             <th>Acciones</th>
           </tr>
         </tfoot>
-
         <tbody>
           {sales.map((sale) => (
-            <SaleRow key={sale.id} sale={sale}/>
+            <SaleRow key={sale.id} sale={sale} />
           ))}
         </tbody>
       </table>

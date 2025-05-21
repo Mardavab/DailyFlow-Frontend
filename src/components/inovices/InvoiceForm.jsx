@@ -2,14 +2,13 @@ import { useContext, useEffect, useState } from "react";
 import { InvoiceContext } from "../../context/Invoice/InvoiceContext";
 
 export const InvoiceForm = ({ handlerCloseForm, invoiceSelected }) => {
-  const { handlerAddInvoice, initialInvoiceForm, suppliers } = useContext(InvoiceContext);
+  const { handlerAddInvoice, initialInvoiceForm, suppliers = [] } = useContext(InvoiceContext);
+
   const [invoiceForm, setInvoiceForm] = useState(initialInvoiceForm);
-  const { id, numeroFactura, proveedorId, fechaEmision, fechaVencimiento, estado, items } = invoiceForm;
+  const { id, invoiceNumber, supplierId, issueDate, dueDate, items = [] } = invoiceForm;
 
   useEffect(() => {
-    setInvoiceForm({
-      ...invoiceSelected,
-    });
+    setInvoiceForm({ ...invoiceSelected });
   }, [invoiceSelected]);
 
   const onInputChange = ({ target }) => {
@@ -23,15 +22,9 @@ export const InvoiceForm = ({ handlerCloseForm, invoiceSelected }) => {
   const onItemChange = (index, field, value) => {
     const updatedItems = [...items];
     updatedItems[index][field] = value;
-    
-    // Calculate total
-    const total = updatedItems.reduce((sum, item) => 
-      sum + (item.cantidad * item.precioUnitario), 0);
-
     setInvoiceForm({
       ...invoiceForm,
       items: updatedItems,
-      total
     });
   };
 
@@ -42,28 +35,27 @@ export const InvoiceForm = ({ handlerCloseForm, invoiceSelected }) => {
         ...items,
         {
           id: Date.now(),
-          descripcion: '',
-          cantidad: 1,
-          precioUnitario: 0
-        }
-      ]
+          description: "",
+          quantity: 1,
+          price: 0,
+        },
+      ],
     });
   };
 
   const removeItem = (itemId) => {
     setInvoiceForm({
       ...invoiceForm,
-      items: items.filter(item => item.id !== itemId)
+      items: items.filter((item) => item.id !== itemId),
     });
   };
 
   const onSubmit = (event) => {
     event.preventDefault();
-    if (!numeroFactura || !proveedorId || !fechaEmision || items.length === 0) {
+    if (!invoiceNumber || !supplierId || !issueDate || items.length === 0) {
       alert("Debe completar todos los campos obligatorios");
       return;
     }
-
     handlerAddInvoice(invoiceForm);
     setInvoiceForm(initialInvoiceForm);
   };
@@ -83,58 +75,54 @@ export const InvoiceForm = ({ handlerCloseForm, invoiceSelected }) => {
               type="text"
               className="form-control"
               placeholder="Ej: FAC-001"
-              name="numeroFactura"
-              value={numeroFactura || ''}
+              name="invoiceNumber"
+              value={invoiceNumber || ''}
               onChange={onInputChange}
               required
             />
           </div>
-
           <div className="form-group">
             <label>Proveedor*</label>
             <select
               className="form-control"
-              name="proveedorId"
-              value={proveedorId || ''}
+              name="supplierId"
+              value={supplierId || ''}
               onChange={onInputChange}
               required
             >
               <option value="">Seleccione un proveedor</option>
-              {suppliers.map(supplier => (
+              {suppliers.map((supplier) => (
                 <option key={supplier.id} value={supplier.id}>
-                  {supplier.nombre}
+                  {supplier.nombre || supplier.name}
                 </option>
               ))}
             </select>
           </div>
         </div>
-
         <div className="col-md-6">
           <div className="form-group">
             <label>Fecha Emisión*</label>
             <input
               type="date"
               className="form-control"
-              name="fechaEmision"
-              value={fechaEmision || ''}
+              name="issueDate"
+              value={issueDate || ''}
               onChange={onInputChange}
               required
             />
           </div>
-
           <div className="form-group">
             <label>Fecha Vencimiento</label>
             <input
               type="date"
               className="form-control"
-              name="fechaVencimiento"
-              value={fechaVencimiento || ''}
+              name="dueDate"
+              value={dueDate || ''}
               onChange={onInputChange}
             />
           </div>
         </div>
       </div>
-
       <div className="mt-4">
         <h5>Ítems de Factura</h5>
         {items.map((item, index) => (
@@ -144,8 +132,8 @@ export const InvoiceForm = ({ handlerCloseForm, invoiceSelected }) => {
                 type="text"
                 className="form-control"
                 placeholder="Descripción"
-                value={item.descripcion}
-                onChange={(e) => onItemChange(index, 'descripcion', e.target.value)}
+                value={item.description}
+                onChange={(e) => onItemChange(index, "description", e.target.value)}
                 required
               />
             </div>
@@ -155,8 +143,8 @@ export const InvoiceForm = ({ handlerCloseForm, invoiceSelected }) => {
                 className="form-control"
                 placeholder="Cantidad"
                 min="1"
-                value={item.cantidad}
-                onChange={(e) => onItemChange(index, 'cantidad', parseInt(e.target.value))}
+                value={item.quantity}
+                onChange={(e) => onItemChange(index, "quantity", parseInt(e.target.value))}
                 required
               />
             </div>
@@ -167,8 +155,8 @@ export const InvoiceForm = ({ handlerCloseForm, invoiceSelected }) => {
                 placeholder="Precio Unitario"
                 min="0"
                 step="0.01"
-                value={item.precioUnitario}
-                onChange={(e) => onItemChange(index, 'precioUnitario', parseFloat(e.target.value))}
+                value={item.price}
+                onChange={(e) => onItemChange(index, "price", parseFloat(e.target.value))}
                 required
               />
             </div>
@@ -183,7 +171,6 @@ export const InvoiceForm = ({ handlerCloseForm, invoiceSelected }) => {
             </div>
           </div>
         ))}
-
         <button
           type="button"
           className="btn btn-secondary btn-sm mt-2"
@@ -192,7 +179,6 @@ export const InvoiceForm = ({ handlerCloseForm, invoiceSelected }) => {
           <i className="fas fa-plus mr-2"></i>Agregar Ítem
         </button>
       </div>
-
       <div className="d-flex justify-content-end mt-4">
         <button
           onClick={onCloseForm}
@@ -205,7 +191,6 @@ export const InvoiceForm = ({ handlerCloseForm, invoiceSelected }) => {
           {id > 0 ? "Actualizar Factura" : "Crear Factura"}
         </button>
       </div>
-
       <input type="hidden" name="id" value={id} />
     </form>
   );
