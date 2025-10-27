@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { InvoiceContext } from "../../context/Invoice/InvoiceContext";
+import { InvoiceContext } from "../../context/invoice/InvoiceContext";
 import { InvoiceModalForm } from "./InvoiceModalForm";
 import { InvoiceList } from "./InvoiceList";
 import { PaymentModalForm } from "./PaymentModalForm";

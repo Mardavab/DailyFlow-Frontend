@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { ProductList } from "./ProductList";
-import { ProductContext } from "../../context/Product/ProductContext";
+import { ProductContext } from "../../context/product/ProductContext";
 import { ProductModalForm } from "./ProductModalForm";
 
 
