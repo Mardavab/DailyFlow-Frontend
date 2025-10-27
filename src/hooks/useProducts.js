@@ -17,17 +17,22 @@ export const useProducts = () => {
   const [visibleForm, setVisibleForm] = useState(false);
   const navigate = useNavigate();
 
+  // ✅ Función reutilizable para traer los productos del backend
+  const fetchProducts = async () => {
+    try {
+      const { data } = await api.get("/product");
+      dispatch({ type: "loadProducts", payload: data });
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "No se pudieron cargar los productos", "error");
+    }
+  };
+
   // 1) Cargar la lista de productos desde el backend
   useEffect(() => {
-    api
-      .get("/product")
-      .then(({ data }) => {
-        dispatch({ type: "loadProducts", payload: data });
-      })
-      .catch((err) => {
-        console.error(err);
-        Swal.fire("Error", "No se pudieron cargar los productos", "error");
-      });
+    fetchProducts();
+    console.log("actualizo");
+    
   }, []);
 
   // 2) Crear o actualizar producto
@@ -35,7 +40,7 @@ export const useProducts = () => {
     try {
       let res;
       if (!product.id || product.id === 0) {
-        // POST (crear): quitar id antes de enviar
+        // POST (crear)
         const { id, ...payload } = product;
         res = await api.post("/product", payload);
         dispatch({ type: "addProduct", payload: res.data });
@@ -104,5 +109,6 @@ export const useProducts = () => {
     handlerAddProduct,
     handlerRemoveProduct,
     handlerSelectProduct,
+    fetchProducts, // 👈 ahora puedes llamarlo desde otros componentes
   };
 };

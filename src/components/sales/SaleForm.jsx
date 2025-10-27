@@ -22,12 +22,12 @@ export const SaleForm = ({ handlerCloseForm, saleSelected }) => {
         ...saleSelected,
         items: saleSelected.details
           ? saleSelected.details.map(det => ({
-              productId: det.product.id,
-              quantity: det.quantity,
-              name: det.product.name,
-              price: det.product.price,
-              subtotal: det.product.price * det.quantity
-            }))
+            productId: det.product.id,
+            quantity: det.quantity,
+            name: det.product.name,
+            price: det.product.salePrice,
+            subtotal: det.product.salePrice * det.quantity
+          }))
           : []
       });
     } else {
@@ -66,8 +66,8 @@ export const SaleForm = ({ handlerCloseForm, saleSelected }) => {
       productId: product.id,
       name: product.name,
       quantity: Number(selectedProduct.quantity),
-      price: product.price,
-      subtotal: product.price * Number(selectedProduct.quantity)
+      price: product.salePrice,
+      subtotal: product.salePrice * Number(selectedProduct.quantity)
     };
 
     setSaleForm({
@@ -97,15 +97,15 @@ export const SaleForm = ({ handlerCloseForm, saleSelected }) => {
       alert("Debe completar todos los campos obligatorios y agregar productos");
       return;
     }
-    // Solo mandamos los campos que el backend espera
+
     handlerAddSale({
-      id: saleForm.id,
       paymentMethod: saleForm.paymentMethod,
       items: saleForm.items.map(item => ({
         productId: item.productId,
         quantity: item.quantity
       }))
     });
+
     setSaleForm({ ...initialSaleForm, items: [] });
   };
 
@@ -129,8 +129,9 @@ export const SaleForm = ({ handlerCloseForm, saleSelected }) => {
               <option value="">Seleccione un producto</option>
               {products.map(product => (
                 <option key={product.id} value={product.id}>
-                  {product.name} - ${product.price.toLocaleString()}
+                  {product.name} - ${product.salePrice ? product.salePrice.toLocaleString() : 0}
                 </option>
+
               ))}
             </select>
           </div>
@@ -146,8 +147,8 @@ export const SaleForm = ({ handlerCloseForm, saleSelected }) => {
             />
           </div>
           <div className="col-md-2">
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="btn btn-sm btn-primary"
               onClick={addProductToSale}
             >
@@ -175,7 +176,7 @@ export const SaleForm = ({ handlerCloseForm, saleSelected }) => {
                   <td>${Number(item.price).toLocaleString()}</td>
                   <td>${Number(item.subtotal || (item.price * item.quantity)).toLocaleString()}</td>
                   <td>
-                    <button 
+                    <button
                       type="button"
                       className="btn btn-sm btn-danger"
                       onClick={() => removeProductFromSale(index)}

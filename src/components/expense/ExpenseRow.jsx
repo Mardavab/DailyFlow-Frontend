@@ -7,8 +7,11 @@ export const ExpenseRow = ({ expense }) => {
 
   return (
     <tr key={expense.id}>
-      <td>{expense.id}</td>
-      <td>${expense.amount}</td>
+      <td>$
+        {Number(expense.amount).toLocaleString("es-CO", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        })}</td>
       <td>{expense.description}</td>
       <td>{expense.date}</td>
       <td>{expense.time}</td>

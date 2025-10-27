@@ -37,7 +37,10 @@ export const DashboardContent = () => {
       <div className="row">
         <ResumeCard
           titulo="Ingresos (Mensuales)"
-          valor={summary.monthlyIncome?.toLocaleString("es-CO", { style: "currency", currency: "COP" })}
+          valor={summary.monthlyIncome?.toLocaleString("es-CO", {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+          })}
           icono="fa-calendar"
           colorBorde="primary"
           colorTexto="primary"
@@ -45,7 +48,10 @@ export const DashboardContent = () => {
 
         <ResumeCard
           titulo="Ingresos (Anuales)"
-          valor={summary.annualIncome?.toLocaleString("es-CO", { style: "currency", currency: "COP" })}
+          valor={summary.annualIncome?.toLocaleString("es-CO", {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+          })}
           icono="fa-dollar-sign"
           colorBorde="success"
           colorTexto="success"

@@ -1,7 +1,7 @@
 
 import { useContext } from "react";
 import { ExpenseContext } from "../../context/expense/ExpenseContext";
-import { ExpenseRow } from "./expenseRow";
+import { ExpenseRow } from "./ExpenseRow";
 
 export const ExpenseList = () => {
   const { expenses = [] } = useContext(ExpenseContext);
@@ -16,7 +16,6 @@ export const ExpenseList = () => {
       >
         <thead>
           <tr>
-            <th>ID</th>
             <th>Monto</th>
             <th>Descripción</th>
             <th>Fecha</th>
@@ -27,7 +26,6 @@ export const ExpenseList = () => {
 
         <tfoot>
           <tr>
-            <th>ID</th>
             <th>Monto</th>
             <th>Descripción</th>
             <th>Fecha</th>

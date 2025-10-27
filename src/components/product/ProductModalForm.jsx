@@ -16,26 +16,40 @@ export const ProductModalForm = () => {
     const { name, value } = e.target;
     setProduct({
       ...product,
-      [name]: name === 'stock' || name === 'price' ? Number(value) : value
+      [name]:
+        ["purchasePrice", "salePrice", "stock"].includes(name)
+          ? Number(value)
+          : value,
     });
   };
 
   const onSubmit = (e) => {
     e.preventDefault();
-    if (!product.name.trim() || product.price <= 0) {
+
+    if (!product.code.trim() || !product.name.trim()) {
       Swal.fire({
         title: "Error",
-        text: "Nombre y precio válido son requeridos",
-        icon: "error"
+        text: "El código y el nombre del producto son obligatorios",
+        icon: "error",
       });
       return;
     }
+
+    if (product.salePrice <= 0) {
+      Swal.fire({
+        title: "Error",
+        text: "El precio de venta debe ser mayor a 0",
+        icon: "error",
+      });
+      return;
+    }
+
     handlerAddProduct(product);
   };
 
   return (
-    <div className="abrir-modal animacion fadeIn" style={{ display: 'block' }} tabIndex="-1" role="dialog">
-      <div className="modal-dialog " role="document">
+    <div className="abrir-modal animacion fadeIn" style={{ display: "block" }} tabIndex="-1" role="dialog">
+      <div className="modal-dialog" role="document">
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">
@@ -45,32 +59,84 @@ export const ProductModalForm = () => {
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
+
           <form onSubmit={onSubmit}>
             <div className="modal-body">
+              
+              <div className="form-group">
+                <label>Código</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="code"
+                  value={product.code || ""}
+                  onChange={onInputChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Marca</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="brand"
+                  value={product.brand || ""}
+                  onChange={onInputChange}
+                />
+              </div>
+
               <div className="form-group">
                 <label>Nombre</label>
                 <input
                   type="text"
                   className="form-control"
                   name="name"
-                  value={product.name || ''}
+                  value={product.name || ""}
                   onChange={onInputChange}
                   required
                 />
               </div>
+
               <div className="form-group">
-                <label>Precio</label>
+                <label>Tamaño</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="size"
+                  value={product.size || ""}
+                  onChange={onInputChange}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Precio de Compra</label>
                 <input
                   type="number"
                   className="form-control"
-                  name="price"
+                  name="purchasePrice"
                   min="0"
-                  step="0.01"
-                  value={product.price || ''}
+                  step="1"
+                  value={product.purchasePrice || ""}
                   onChange={onInputChange}
                   required
                 />
               </div>
+
+              <div className="form-group">
+                <label>Precio de Venta</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  name="salePrice"
+                  min="0"
+                  step="1"
+                  value={product.salePrice || ""}
+                  onChange={onInputChange}
+                  required
+                />
+              </div>
+
               <div className="form-group">
                 <label>Stock</label>
                 <input
@@ -78,12 +144,15 @@ export const ProductModalForm = () => {
                   className="form-control"
                   name="stock"
                   min="0"
-                  value={product.stock || ''}
+                  step="1"
+                  value={product.stock || ""}
                   onChange={onInputChange}
                   required
                 />
               </div>
+
             </div>
+
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" onClick={handlerCloseForm}>
                 Cancelar
@@ -92,6 +161,7 @@ export const ProductModalForm = () => {
                 Guardar
               </button>
             </div>
+
           </form>
         </div>
       </div>

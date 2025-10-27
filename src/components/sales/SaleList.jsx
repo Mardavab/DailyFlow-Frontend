@@ -15,7 +15,6 @@ export const SaleList = () => {
       >
         <thead>
           <tr>
-            <th>ID</th>
             <th>Monto</th>
             <th>Método de Pago</th>
             <th>Fecha</th>
@@ -26,7 +25,6 @@ export const SaleList = () => {
         </thead>
         <tfoot>
           <tr>
-            <th>ID</th>
             <th>Monto</th>
             <th>Método de Pago</th>
             <th>Fecha</th>

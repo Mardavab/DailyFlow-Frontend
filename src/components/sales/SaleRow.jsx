@@ -4,19 +4,32 @@ import { SalesContext } from "../../context/sales/SalesContext";
 export const SaleRow = ({ sale }) => {
   const { handlerSelectSaleForm, handlerRemoveSale } = useContext(SalesContext);
 
+  const formatTime = (timeString) => {
+    if (!timeString) return "";
+    try {
+      const date = new Date(`1970-01-01T${timeString}`);
+      return date.toLocaleTimeString("es-CO", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false, 
+      });
+    } catch {
+      return timeString; 
+    }
+  };
+
   return (
     <tr key={sale.id}>
-      <td>{sale.id}</td>
       <td>
         $
         {Number(sale.amount).toLocaleString("es-CO", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
         })}
       </td>
       <td>{sale.paymentMethod}</td>
       <td>{sale.date}</td>
-      <td>{sale.time}</td>
+      <td>{formatTime(sale.time)}</td>
       <td>
         <ul className="mb-0">
           {sale.details?.map((det) => (
