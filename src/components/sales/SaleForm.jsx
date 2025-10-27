@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { SalesContext } from "../../context/sales/SalesContext";
-import { ProductContext } from "../../context/Product/ProductContext";
+import { ProductContext } from "../../context/product/ProductContext";
 
 export const SaleForm = ({ handlerCloseForm, saleSelected }) => {
   const { handlerAddSale, initialSaleForm } = useContext(SalesContext);
