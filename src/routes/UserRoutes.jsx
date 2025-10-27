@@ -12,7 +12,7 @@ import { ExpenseContent } from "../components/expense/ExpenseContent";
 
 import { SupplierProvider } from "../context/Supplier/SupplierProvider ";
 import { SuppliersContent } from "../components/suppliers/SuppliersContent";
-import { InvoiceProvider } from "../context/Invoice/InvoiceContent";
+import { InvoiceProvider } from "../context/Invoice/InvoiceContext";
 import { InvoicesContent } from "../components/inovices/InvoicesContent";
 import { ProductProvider } from "../context/product/ProductProvider";
 import { ProductsContent } from "../components/product/ProductsContent";
