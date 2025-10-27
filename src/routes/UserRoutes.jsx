@@ -1,21 +1,21 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import { DashboardContext } from "../components/DashboardContext";
-import { UsersContext } from "../components/users/UsersContext";
-import { SaleContext } from "../components/sales/SaleContext";
+import { DashboardContent } from "../components/DashboardContent";
+import { UsersContent } from "../components/users/UsersContent";
+import { SaleContent } from "../components/sales/SaleContent";
 import { SideBar } from "../components/sidebar/SideBar";
 import { TopNavbar } from "../components/sidebar/TopNavbar";
-import { UserProvider } from "../context/User/UserProvider";
-import { SalesProvider } from "../context/sales/SalesProvider";
-import { ExpenseProvider } from "../context/expense/ExpenseProvider";
+import { UserProvider } from "../Content/User/UserProvider";
+import { SalesProvider } from "../Content/sales/SalesProvider";
+import { ExpenseProvider } from "../Content/expense/ExpenseProvider";
 
-import { ExpenseContext } from "../components/expense/ExpenseContext";
+import { ExpenseContent } from "../components/expense/ExpenseContent";
 
-import { SupplierProvider } from "../context/Supplier/SupplierProvider ";
-import { SuppliersContext } from "../components/suppliers/SuppliersContext";
-import { InvoiceProvider } from "../context/Invoice/InvoiceContext";
-import { InvoicesContext } from "../components/inovices/InvoicesContext";
-import { ProductProvider } from "../context/product/ProductProvider";
-import { ProductsContext } from "../components/product/ProductsContext";
+import { SupplierProvider } from "../Content/Supplier/SupplierProvider ";
+import { SuppliersContent } from "../components/suppliers/SuppliersContent";
+import { InvoiceProvider } from "../Context/Invoice/InvoiceContent";
+import { InvoicesContent } from "../components/inovices/InvoicesContent";
+import { ProductProvider } from "../Content/product/ProductProvider";
+import { ProductsContent } from "../components/product/ProductsContent";
 
 export const UserRoutes = () => {
   return (
@@ -23,8 +23,8 @@ export const UserRoutes = () => {
       <div id="page-top">
         <div id="wrapper">
           <SideBar />
-          <div id="Context-wrapper" className="d-flex flex-column">
-            <div id="Context">
+          <div id="Content-wrapper" className="d-flex flex-column">
+            <div id="Content">
               <UserProvider>
                 <SalesProvider>
                   <ExpenseProvider>
@@ -36,30 +36,30 @@ export const UserRoutes = () => {
                             <Routes>
                               <Route
                                 path="dashboard"
-                                element={<DashboardContext />}
+                                element={<DashboardContent />}
                               />
                               <Route
                                 path="/expenses"
-                                element={<ExpenseContext />}
+                                element={<ExpenseContent />}
                               />
                               <Route
                                 path="/security/users"
-                                element={<UsersContext />}
+                                element={<UsersContent />}
                               />
                               
                               <Route
                                 path="/purchases/invoices"
-                                element={<InvoicesContext />}
+                                element={<InvoicesContent />}
                               />
                               <Route
                                 path="/purchases/suppliers"
-                                element={<SuppliersContext />}
+                                element={<SuppliersContent />}
                               />
                               <Route
                                 path="/inventory"
-                                element={<ProductsContext/>}
+                                element={<ProductsContent/>}
                               />
-                              <Route path="/sales" element={<SaleContext />} />
+                              <Route path="/sales" element={<SaleContent />} />
                               <Route
                                 path="/"
                                 element={<Navigate to="/dashboard" />}
