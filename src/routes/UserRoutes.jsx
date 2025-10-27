@@ -4,15 +4,15 @@ import { UsersContent } from "../components/users/UsersContent";
 import { SaleContent } from "../components/sales/SaleContent";
 import { SideBar } from "../components/sidebar/SideBar";
 import { TopNavbar } from "../components/sidebar/TopNavbar";
-import { UserProvider } from "../Context/User/UserProvider";
-import { SalesProvider } from "../Context/sales/SalesProvider";
-import { ExpenseProvider } from "../Context/expense/ExpenseProvider";
+import { UserProvider } from "../context/User/UserProvider";
+import { SalesProvider } from "../context/sales/SalesProvider";
+import { ExpenseProvider } from "../context/expense/ExpenseProvider";
 
 import { ExpenseContent } from "../components/expense/ExpenseContent";
 
-import { SupplierProvider } from "../Content/Supplier/SupplierProvider ";
+import { SupplierProvider } from "../context/Supplier/SupplierProvider ";
 import { SuppliersContent } from "../components/suppliers/SuppliersContent";
-import { InvoiceProvider } from "../Context/Invoice/InvoiceContent";
+import { InvoiceProvider } from "../context/Invoice/InvoiceContent";
 import { InvoicesContent } from "../components/inovices/InvoicesContent";
 import { ProductProvider } from "../Content/product/ProductProvider";
 import { ProductsContent } from "../components/product/ProductsContent";
