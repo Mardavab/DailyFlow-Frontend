@@ -1,21 +1,21 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import { DashboardContent } from "../components/DashboardContent";
-import { UsersContent } from "../components/users/UsersContent";
-import { SaleContent } from "../components/sales/SaleContent";
+import { DashboardContext } from "../components/DashboardContext";
+import { UsersContext } from "../components/users/UsersContext";
+import { SaleContext } from "../components/sales/SaleContext";
 import { SideBar } from "../components/sidebar/SideBar";
 import { TopNavbar } from "../components/sidebar/TopNavbar";
 import { UserProvider } from "../context/User/UserProvider";
 import { SalesProvider } from "../context/sales/SalesProvider";
 import { ExpenseProvider } from "../context/expense/ExpenseProvider";
 
-import { ExpenseContent } from "../components/expense/ExpenseContent";
+import { ExpenseContext } from "../components/expense/ExpenseContext";
 
 import { SupplierProvider } from "../context/Supplier/SupplierProvider ";
-import { SuppliersContent } from "../components/suppliers/SuppliersContent";
+import { SuppliersContext } from "../components/suppliers/SuppliersContext";
 import { InvoiceProvider } from "../context/Invoice/InvoiceContext";
-import { InvoicesContent } from "../components/inovices/InvoicesContent";
+import { InvoicesContext } from "../components/inovices/InvoicesContext";
 import { ProductProvider } from "../context/product/ProductProvider";
-import { ProductsContent } from "../components/product/ProductsContent";
+import { ProductsContext } from "../components/product/ProductsContext";
 
 export const UserRoutes = () => {
   return (
@@ -23,8 +23,8 @@ export const UserRoutes = () => {
       <div id="page-top">
         <div id="wrapper">
           <SideBar />
-          <div id="content-wrapper" className="d-flex flex-column">
-            <div id="content">
+          <div id="Context-wrapper" className="d-flex flex-column">
+            <div id="Context">
               <UserProvider>
                 <SalesProvider>
                   <ExpenseProvider>
@@ -36,30 +36,30 @@ export const UserRoutes = () => {
                             <Routes>
                               <Route
                                 path="dashboard"
-                                element={<DashboardContent />}
+                                element={<DashboardContext />}
                               />
                               <Route
                                 path="/expenses"
-                                element={<ExpenseContent />}
+                                element={<ExpenseContext />}
                               />
                               <Route
                                 path="/security/users"
-                                element={<UsersContent />}
+                                element={<UsersContext />}
                               />
                               
                               <Route
                                 path="/purchases/invoices"
-                                element={<InvoicesContent />}
+                                element={<InvoicesContext />}
                               />
                               <Route
                                 path="/purchases/suppliers"
-                                element={<SuppliersContent />}
+                                element={<SuppliersContext />}
                               />
                               <Route
                                 path="/inventory"
-                                element={<ProductsContent/>}
+                                element={<ProductsContext/>}
                               />
-                              <Route path="/sales" element={<SaleContent />} />
+                              <Route path="/sales" element={<SaleContext />} />
                               <Route
                                 path="/"
                                 element={<Navigate to="/dashboard" />}
