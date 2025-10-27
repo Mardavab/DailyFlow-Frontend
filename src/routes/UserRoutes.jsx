@@ -1,19 +1,19 @@
-import { Navigate, Route, Routes } from "react-router-dom";
-import { DashboardContent } from "../components/DashboardContent";
-import { UsersContent } from "../components/users/UsersContent";
-import { SaleContent } from "../components/sales/SaleContent";
-import { SideBar } from "../components/sidebar/SideBar";
-import { TopNavbar } from "../components/sidebar/TopNavbar";
-import { UserProvider } from "../context/User/UserProvider";
-import { SalesProvider } from "../context/sales/SalesProvider";
-import { ExpenseProvider } from "../context/expense/ExpenseProvider";
-import { ExpenseContent } from "../components/expense/ExpenseContent";
-import { SupplierProvider } from "../context/Supplier/SupplierProvider";
-import { SuppliersContent } from "../components/suppliers/SuppliersContent";
-import { InvoiceProvider } from "../context/invoice/InvoiceContext";
-import { InvoicesContent } from "../components/inovices/InvoicesContent";
+import { Navigate, Route, Routes } from "react-router-dom"; 
+import { DashboardContent } from "../components/DashboardContent"; 
+import { UsersContent } from "../components/users/UsersContent"; 
+import { SaleContent } from "../components/sales/SaleContent"; 
+import { SideBar } from "../components/sidebar/SideBar"; 
+import { TopNavbar } from "../components/sidebar/TopNavbar"; 
+import { UserProvider } from "../context/User/UserProvider"; 
+import { SalesProvider } from "../context/sales/SalesProvider"; 
+import { ExpenseProvider } from "../context/expense/ExpenseProvider"; 
+import { ExpenseContent } from "../components/expense/ExpenseContent"; 
+import { SupplierProvider } from "../context/Supplier/SupplierProvider "; 
+import { SuppliersContent } from "../components/suppliers/SuppliersContent"; 
+import { InvoiceProvider } from "../context/invoice/InvoiceContext"; 
+import { InvoicesContent } from "../components/inovices/InvoicesContent"; 
 import { ProductProvider } from "../context/product/ProductProvider";
-import { ProductsContent } from "../components/product/ProductsContent";
+ import { ProductsContent } from "../components/product/ProductsContent";
 
 export const UserRoutes = () => {
   return (
