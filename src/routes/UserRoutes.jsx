@@ -4,9 +4,9 @@ import { UsersContent } from "../components/users/UsersContent";
 import { SaleContent } from "../components/sales/SaleContent";
 import { SideBar } from "../components/sidebar/SideBar";
 import { TopNavbar } from "../components/sidebar/TopNavbar";
-import { UserProvider } from "../Content/User/UserProvider";
-import { SalesProvider } from "../Content/sales/SalesProvider";
-import { ExpenseProvider } from "../Content/expense/ExpenseProvider";
+import { UserProvider } from "../Context/User/UserProvider";
+import { SalesProvider } from "../Context/sales/SalesProvider";
+import { ExpenseProvider } from "../Context/expense/ExpenseProvider";
 
 import { ExpenseContent } from "../components/expense/ExpenseContent";
 
