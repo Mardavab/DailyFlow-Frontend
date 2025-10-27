@@ -1,6 +1,6 @@
 import { ResumeCard } from "./ResumeCard";
 import { useDashboard } from "../hooks/useDashboard";
-import { Spinner } from "../components/Spinner"; // Opcional, usa tu propio spinner
+import { Spinner } from "./Spinner"; // Opcional, usa tu propio spinner
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend,
 } from 'recharts';
