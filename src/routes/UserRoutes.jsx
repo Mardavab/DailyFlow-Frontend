@@ -14,7 +14,7 @@ import { SupplierProvider } from "../context/Supplier/SupplierProvider ";
 import { SuppliersContent } from "../components/suppliers/SuppliersContent";
 import { InvoiceProvider } from "../context/Invoice/InvoiceContent";
 import { InvoicesContent } from "../components/inovices/InvoicesContent";
-import { ProductProvider } from "../Content/product/ProductProvider";
+import { ProductProvider } from "../context/product/ProductProvider";
 import { ProductsContent } from "../components/product/ProductsContent";
 
 export const UserRoutes = () => {
