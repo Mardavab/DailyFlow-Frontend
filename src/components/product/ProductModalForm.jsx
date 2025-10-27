@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect } from "react";
-import { ProductContext } from "../../context/Product/ProductContext";
+import { ProductContext } from "../../context/product/ProductContext";
 import Swal from "sweetalert2";
 
 export const ProductModalForm = () => {

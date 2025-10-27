@@ -1,5 +1,5 @@
 import { useContext, useEffect } from "react";
-import { ProductContext } from "../../context/Product/ProductContext";
+import { ProductContext } from "../../context/product/ProductContext";
 
 export const ProductList = () => {
   const { products, handlerRemoveProduct, handlerSelectProductm, fetchProducts } = useContext(ProductContext);
