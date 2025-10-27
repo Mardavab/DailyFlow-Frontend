@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { InvoiceContext } from "../../context/Invoice/InvoiceContext";
+import { InvoiceContext } from "../../context/invoice/InvoiceContext";
 
 export const InvoiceForm = ({ handlerCloseForm, invoiceSelected }) => {
   const { handlerAddInvoice, initialInvoiceForm, suppliers = [] } = useContext(InvoiceContext);

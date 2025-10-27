@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { InvoiceContext } from "../../context/Invoice/InvoiceContext";
+import { InvoiceContext } from "../../context/invoice/InvoiceContext";
 import { InvoiceForm } from "./InvoiceForm";
 
 export const InvoiceModalForm = ({ show, handlerCloseForm, invoiceSelected }) => {

@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { InvoiceRow } from "./InvoiceRow";
-import { InvoiceContext } from "../../context/Invoice/InvoiceContext";
+import { InvoiceContext } from "../../context/invoice/InvoiceContext";
 
 export const InvoiceList = ({
   onShowPaymentForm,
