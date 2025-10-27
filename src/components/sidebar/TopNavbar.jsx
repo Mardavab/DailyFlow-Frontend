@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import profileImage from "../../../public/img/undraw_profile.svg";
+import profileImage from "../../template/img/undraw_profile.svg";
 import { AuthContext } from "../../auth/context/AuthContext";
 
 export const TopNavbar = () => {
